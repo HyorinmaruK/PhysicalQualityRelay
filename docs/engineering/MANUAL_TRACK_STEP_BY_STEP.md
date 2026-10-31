@@ -10,6 +10,8 @@ Open the interactive version before you build: [`web/manual_track_visualizer.htm
 
 The visualizer is a training aid. It produces no evidence, and its decision thresholds are placeholders.
 
+For the physical build itself, open [`web/physical_build_guide.html`](../../web/physical_build_guide.html). It shows the breadboard hole by hole with each jumper's type, a 3D-style view of the whole bench with every cable (manual track, gravity chute, or motorized belt for comparison), a side view of the exit and swivel chute, a recordable bench test (36 tests, CSV export), a parts list, and what to 3D print.
+
 ## Scope
 
 - The carrier is pushed by hand between stops. There is no powered conveyor, motor, or motor driver.
@@ -21,6 +23,12 @@ The visualizer is a training aid. It produces no evidence, and its decision thre
 What the repository supports today: the specimens, the servo firmware, and this guide. You stage routes by typing `P`, `H`, or `R` in the Arduino Serial Monitor and record evidence in [`templates/manual_track_run_log.csv`](templates/manual_track_run_log.csv). The `/demo/` session API, two-webcam capture page, and serial bridge described in `.kiro/specs/manual-track-demo/` are **not implemented yet**.
 
 ---
+
+## 0. What to 3D print
+
+Required: the 9 specimens in `examples/cad/stl/` (list in section 1). Print them flat in white/light PLA, one batch, same settings: 0.2 mm layers, 3–4 walls, 20–40% infill, no supports, no scaling, no brim (or remove it fully). Measure widths at mid-height. Record printer, nozzle, material, and layer height.
+
+Optional: carrier, track sections, caliper blocks, swivel chute, servo mount. The repository has no CAD for these; cardboard, foam board, or wood work fine. Sizes are in `web/physical_build_guide.html`, tab 5.
 
 ## 1. Prepare specimens (before any wiring)
 
@@ -55,6 +63,23 @@ Mark these positions on the baseboard (distance from the left edge):
 ## 3. Wiring: connect in this order
 
 Everything stays unplugged until step 12. The step numbers match the visualizer's wiring tab.
+
+Jumper types for the recommended layout (ESP32 pressed into the breadboard in rows b and i, columns 3–17, USB to the left):
+
+| ID | Jumper | From | To |
+|---|---|---|---|
+| W7 | M–M red | DC jack adapter + terminal | top + rail, col 52 |
+| W8 | M–M black | DC jack adapter − terminal | top − rail, col 53 |
+| C1 | capacitor legs | long leg: top + rail col 47 | stripe leg: top − rail col 47 |
+| W1 | M–M black | a4 (ESP32 GND) | top − rail, col 36 |
+| W4 | M–M brown | servo plug brown socket | top − rail, col 44 |
+| W3 | M–M red | servo plug red socket | top + rail, col 42 |
+| W2 | M–M orange | servo plug orange socket | a5 (ESP32 D13) |
+| SW1 | button legs | e22, e24 | f22, f24 |
+| W5 | M–M green | a12 (ESP32 D32) | j22 |
+| W6 | M–M black | a24 | top − rail, col 38 |
+
+That is 8 male–male jumpers. If the ESP32 does not fit on the breadboard with row a free, leave it off the board and use male–female jumpers for W1, W2, and W5 (socket end on the ESP32 pin). Female–female jumpers are not needed. Column numbers assume a 30-pin DEVKIT V1; follow the printed pin labels on your board.
 
 | Step | From | To | Why | Check before moving on |
 |---:|---|---|---|---|
