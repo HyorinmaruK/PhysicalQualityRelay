@@ -140,6 +140,49 @@ code{background:#0c121b;padding:1px 5px;border-radius:5px}
     <div class="panel">
       <h2>Option A — potentiometer / linear gauge (reliable)</h2>
       <p class="muted" style="margin-top:0">A linear slide potentiometer is a cheap position gauge: easy to wire and always works, but lower precision than your digital caliper and it <b>must be calibrated</b>. Good for a second axis (say height) or as a backup. It reuses the repo's existing <code>potentiometer_to_mm()</code> in <code>qualityrelay17/hardware_ingest.py</code> and the <code>/hardware/caliper-reading</code> endpoint.</p>
+      <svg viewBox="0 0 660 400" aria-label="ESP32 measurement-station schematic">
+        <!-- ESP32 -->
+        <rect x="270" y="70" width="150" height="300" rx="8" class="part"/>
+        <text x="345" y="60" text-anchor="middle" class="lbls">ESP32 DevKit — use pins by their printed labels</text>
+        <g font-size="11" fill="#e9f0fb">
+          <circle cx="270" cy="110" r="4" fill="#ff7b7b"/><text x="280" y="114">3V3</text>
+          <circle cx="270" cy="150" r="4" fill="#9aadc5"/><text x="280" y="154">GND</text>
+          <circle cx="270" cy="210" r="4" fill="#ff9d2e"/><text x="280" y="214">GPIO34</text>
+          <circle cx="270" cy="280" r="4" fill="#5ccc91"/><text x="280" y="284">GPIO32</text>
+          <circle cx="420" cy="110" r="4" fill="#ff7b7b"/><text x="410" y="114" text-anchor="end">5V/VIN</text>
+          <circle cx="420" cy="150" r="4" fill="#9aadc5"/><text x="410" y="154" text-anchor="end">GND</text>
+          <circle cx="420" cy="210" r="4" fill="#6ea8ff"/><text x="410" y="214" text-anchor="end">GPIO21</text>
+          <circle cx="420" cy="260" r="4" fill="#efd271"/><text x="410" y="264" text-anchor="end">GPIO22</text>
+        </g>
+        <text x="345" y="335" text-anchor="middle" class="lbls" font-size="9">GPIO34 = ADC in · GPIO21 = SDA · GPIO22 = SCL</text>
+        <!-- potentiometer -->
+        <rect x="40" y="90" width="120" height="60" rx="6" class="part" fill="#1b2635"/>
+        <text x="100" y="84" text-anchor="middle" class="lbls">linear pot / slide gauge (~10 kΩ)</text>
+        <g font-size="9" fill="#9aadc5"><text x="55" y="165">pin1</text><text x="90" y="165">wiper</text><text x="126" y="165">pin2</text></g>
+        <circle cx="65" cy="150" r="3" fill="#ff7b7b"/><circle cx="100" cy="150" r="3" fill="#ff9d2e"/><circle cx="135" cy="150" r="3" fill="#9aadc5"/>
+        <!-- button -->
+        <rect x="55" y="250" width="100" height="55" rx="6" class="part" fill="#1b2635"/>
+        <text x="105" y="244" text-anchor="middle" class="lbls">push button (send reading)</text>
+        <circle cx="80" cy="305" r="3" fill="#5ccc91"/><circle cx="130" cy="305" r="3" fill="#9aadc5"/>
+        <!-- LCD optional -->
+        <rect x="470" y="90" width="160" height="90" rx="6" class="part" fill="#141d2a" stroke-dasharray="5 3"/>
+        <text x="550" y="84" text-anchor="middle" class="lbls">QAPASS 16×2 I²C LCD (optional)</text>
+        <g font-size="9" fill="#9aadc5"><text x="483" y="196">VCC</text><text x="518" y="196">GND</text><text x="553" y="196">SDA</text><text x="588" y="196">SCL</text></g>
+        <circle cx="490" cy="180" r="3" fill="#ff7b7b"/><circle cx="525" cy="180" r="3" fill="#9aadc5"/><circle cx="560" cy="180" r="3" fill="#6ea8ff"/><circle cx="595" cy="180" r="3" fill="#efd271"/>
+        <!-- wires -->
+        <path class="wire" stroke="#ff7b7b" d="M65,150 V80 L255,80 V110 H270"/>
+        <path class="wire" stroke="#ff9d2e" d="M100,150 V200 H270"/>
+        <path class="wire" stroke="#9aadc5" d="M135,150 V172 H252 V150 H270"/>
+        <path class="wire" stroke="#5ccc91" d="M80,305 V290 H256 V280 H270"/>
+        <path class="wire" stroke="#9aadc5" d="M130,305 V330 H260 V150 H270"/>
+        <path class="wire" stroke="#ff7b7b" d="M490,180 V110 H420"/>
+        <path class="wire" stroke="#9aadc5" d="M525,180 V150 H420"/>
+        <path class="wire" stroke="#6ea8ff" d="M560,180 V210 H420"/>
+        <path class="wire" stroke="#efd271" d="M595,180 V260 H420"/>
+        <!-- legend -->
+        <g font-size="9" fill="#9aadc5"><text x="40" y="360">red = 3V3/5V · grey = GND · orange = wiper→GPIO34 · green = button→GPIO32 · blue = SDA · yellow = SCL</text>
+        <text x="40" y="376">GND is shared: pot pin2, button, and LCD all return to any ESP32 GND pin.</text></g>
+      </svg>
       <table><thead><tr><th>from</th><th>to</th><th>why</th></tr></thead><tbody>
         <tr><td>pot outer pin 1</td><td>ESP32 3V3</td><td>top of the divider</td></tr>
         <tr><td>pot outer pin 2</td><td>ESP32 GND</td><td>bottom of the divider</td></tr>
@@ -151,6 +194,16 @@ code{background:#0c121b;padding:1px 5px;border-radius:5px}
       </tbody></table>
       <div class="note"><b>Calibrate first.</b> Measure at least five known positions against the real caliper, then set <code>ADC_MIN/ADC_MAX</code> and <code>MM_MIN/MM_MAX</code> in the sketch. Without that the millimetres are meaningless.</div>
       <p class="tiny">Firmware: <code>firmware/measurement_station/esp32_measurement_station.ino</code> (default mode). GPIO34 is input-only and ADC-safe.</p>
+      <h3>Wire it and test (USB unplugged while wiring)</h3>
+      <ol class="tiny" style="margin:0;padding-left:18px">
+        <li>Wire the three pot pins, then the button. The LCD is optional — skip it for the first test.</li>
+        <li>Multimeter across the pot: wiper (GPIO34 wire) should read 0 → 3.3 V as you slide it. If it does not, swap pin1/pin2.</li>
+        <li>Plug in USB. Flash <code>esp32_measurement_station.ino</code> with <code>READ_SOURCE = SOURCE_POT</code>. Open Serial Monitor at 115200; you should see <code># QRM ready</code>.</li>
+        <li>Press the button. A number prints each press. Slide the gauge, press again: the number changes.</li>
+        <li>Calibrate: at ≥ 5 known caliper positions, note the printed raw/number, then set <code>ADC_MIN/ADC_MAX</code> and <code>MM_MIN/MM_MAX</code> in the sketch and reflash.</li>
+        <li>In this page (tab 1) click <b>Connect ESP32</b>, pick the port, then press the button — the value lands in the focused field. Click "Add specimen to log".</li>
+      </ol>
+      <div class="danger">Never feed more than 3.3 V into any GPIO: the pot's top pin must go to <b>3V3</b>, not 5V/VIN. The ADC is slightly non-linear near 0 V and 3.3 V, which the calibration absorbs.</div>
     </div>
     <div class="panel">
       <h2>Option B — digital caliper data port (precise, advanced)</h2>
