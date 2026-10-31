@@ -140,49 +140,7 @@ code{background:#0c121b;padding:1px 5px;border-radius:5px}
     <div class="panel">
       <h2>Option A — potentiometer / linear gauge (reliable)</h2>
       <p class="muted" style="margin-top:0">A linear slide potentiometer is a cheap position gauge: easy to wire and always works, but lower precision than your digital caliper and it <b>must be calibrated</b>. Good for a second axis (say height) or as a backup. It reuses the repo's existing <code>potentiometer_to_mm()</code> in <code>qualityrelay17/hardware_ingest.py</code> and the <code>/hardware/caliper-reading</code> endpoint.</p>
-      <svg viewBox="0 0 660 400" aria-label="ESP32 measurement-station schematic">
-        <!-- ESP32 -->
-        <rect x="270" y="70" width="150" height="300" rx="8" class="part"/>
-        <text x="345" y="60" text-anchor="middle" class="lbls">ESP32 DevKit — use pins by their printed labels</text>
-        <g font-size="11" fill="#e9f0fb">
-          <circle cx="270" cy="110" r="4" fill="#ff7b7b"/><text x="280" y="114">3V3</text>
-          <circle cx="270" cy="150" r="4" fill="#9aadc5"/><text x="280" y="154">GND</text>
-          <circle cx="270" cy="210" r="4" fill="#ff9d2e"/><text x="280" y="214">GPIO34</text>
-          <circle cx="270" cy="280" r="4" fill="#5ccc91"/><text x="280" y="284">GPIO32</text>
-          <circle cx="420" cy="110" r="4" fill="#ff7b7b"/><text x="410" y="114" text-anchor="end">5V/VIN</text>
-          <circle cx="420" cy="150" r="4" fill="#9aadc5"/><text x="410" y="154" text-anchor="end">GND</text>
-          <circle cx="420" cy="210" r="4" fill="#6ea8ff"/><text x="410" y="214" text-anchor="end">GPIO21</text>
-          <circle cx="420" cy="260" r="4" fill="#efd271"/><text x="410" y="264" text-anchor="end">GPIO22</text>
-        </g>
-        <text x="345" y="335" text-anchor="middle" class="lbls" font-size="9">GPIO34 = ADC in · GPIO21 = SDA · GPIO22 = SCL</text>
-        <!-- potentiometer -->
-        <rect x="40" y="90" width="120" height="60" rx="6" class="part" fill="#1b2635"/>
-        <text x="100" y="84" text-anchor="middle" class="lbls">linear pot / slide gauge (~10 kΩ)</text>
-        <g font-size="9" fill="#9aadc5"><text x="55" y="165">pin1</text><text x="90" y="165">wiper</text><text x="126" y="165">pin2</text></g>
-        <circle cx="65" cy="150" r="3" fill="#ff7b7b"/><circle cx="100" cy="150" r="3" fill="#ff9d2e"/><circle cx="135" cy="150" r="3" fill="#9aadc5"/>
-        <!-- button -->
-        <rect x="55" y="250" width="100" height="55" rx="6" class="part" fill="#1b2635"/>
-        <text x="105" y="244" text-anchor="middle" class="lbls">push button (send reading)</text>
-        <circle cx="80" cy="305" r="3" fill="#5ccc91"/><circle cx="130" cy="305" r="3" fill="#9aadc5"/>
-        <!-- LCD optional -->
-        <rect x="470" y="90" width="160" height="90" rx="6" class="part" fill="#141d2a" stroke-dasharray="5 3"/>
-        <text x="550" y="84" text-anchor="middle" class="lbls">QAPASS 16×2 I²C LCD (optional)</text>
-        <g font-size="9" fill="#9aadc5"><text x="483" y="196">VCC</text><text x="518" y="196">GND</text><text x="553" y="196">SDA</text><text x="588" y="196">SCL</text></g>
-        <circle cx="490" cy="180" r="3" fill="#ff7b7b"/><circle cx="525" cy="180" r="3" fill="#9aadc5"/><circle cx="560" cy="180" r="3" fill="#6ea8ff"/><circle cx="595" cy="180" r="3" fill="#efd271"/>
-        <!-- wires -->
-        <path class="wire" stroke="#ff7b7b" d="M65,150 V80 L255,80 V110 H270"/>
-        <path class="wire" stroke="#ff9d2e" d="M100,150 V200 H270"/>
-        <path class="wire" stroke="#9aadc5" d="M135,150 V172 H252 V150 H270"/>
-        <path class="wire" stroke="#5ccc91" d="M80,305 V290 H256 V280 H270"/>
-        <path class="wire" stroke="#9aadc5" d="M130,305 V330 H260 V150 H270"/>
-        <path class="wire" stroke="#ff7b7b" d="M490,180 V110 H420"/>
-        <path class="wire" stroke="#9aadc5" d="M525,180 V150 H420"/>
-        <path class="wire" stroke="#6ea8ff" d="M560,180 V210 H420"/>
-        <path class="wire" stroke="#efd271" d="M595,180 V260 H420"/>
-        <!-- legend -->
-        <g font-size="9" fill="#9aadc5"><text x="40" y="360">red = 3V3/5V · grey = GND · orange = wiper→GPIO34 · green = button→GPIO32 · blue = SDA · yellow = SCL</text>
-        <text x="40" y="376">GND is shared: pot pin2, button, and LCD all return to any ESP32 GND pin.</text></g>
-      </svg>
+      <svg id="bbMeas" viewBox="0 -28 640 290" aria-label="ESP32 measurement station on a breadboard"></svg>
       <table><thead><tr><th>from</th><th>to</th><th>why</th></tr></thead><tbody>
         <tr><td>pot outer pin 1</td><td>ESP32 3V3</td><td>top of the divider</td></tr>
         <tr><td>pot outer pin 2</td><td>ESP32 GND</td><td>bottom of the divider</td></tr>
@@ -478,6 +436,71 @@ $('#devConnect').onclick=async()=>{
   catch(e){devNote('Connect cancelled or failed: '+(e.name||e));}
 };
 $('#devDisconnect').onclick=async()=>{keepReading=false;try{if(reader){await reader.cancel();reader=null;}if(port){await port.close();port=null;}}catch(e){}setDevConnected(false);};
+
+// ---- breadboard layout for the measurement station (static render) ----
+(function(){
+  const svg=document.getElementById('bbMeas'); if(!svg) return;
+  const NS='http://www.w3.org/2000/svg';
+  const E=(t,a,txt)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;svg.appendChild(e);return e;};
+  const P=12,x0=60,cx=c=>x0+(c-1)*P,NC=34;
+  const RY={plus:24,minus:38,a:66,b:78,c:90,d:102,e:114,f:150,g:162,h:174,i:186,j:198};
+  const right=cx(NC)+14;
+  E('rect',{x:40,y:12,width:right-40,height:200,rx:6,fill:'#ece8de',stroke:'#b9b3a3'});
+  E('rect',{x:40,y:128,width:right-40,height:10,fill:'#d6d0c2'});
+  E('line',{x1:50,x2:right-6,y1:24,y2:24,stroke:'#ff7b7b','stroke-width':1.3});
+  E('line',{x1:50,x2:right-6,y1:38,y2:38,stroke:'#6ea8ff','stroke-width':1.3});
+  E('text',{x:44,y:27,'font-size':11,fill:'#ff7b7b','font-weight':700},'+');
+  E('text',{x:44,y:42,'font-size':11,fill:'#6ea8ff','font-weight':700},'\u2212');
+  E('text',{x:right+2,y:27,'font-size':9,fill:'#9aadc5'},'3V3');
+  E('text',{x:right+2,y:42,'font-size':9,fill:'#9aadc5'},'GND');
+  const rows=['plus','minus','a','b','c','d','e','f','g','h','i','j'];
+  for(const r of rows){for(let c=1;c<=NC;c++){E('rect',{x:cx(c)-2,y:RY[r]-2,width:4,height:4,fill:'#2b2b2b'});}}
+  for(let c=1;c<=NC;c+=5){E('text',{x:cx(c),y:RY.j+16,'font-size':8,fill:'#888','text-anchor':'middle'},''+c);}
+  for(const r of ['a','b','c','d','e','f','g','h','i','j']){E('text',{x:46,y:RY[r]+3,'font-size':8,fill:'#888'},r);}
+  // ESP32 body (pins sit in rows b and i; we jumper from the free rows a and j)
+  E('rect',{x:cx(3)-5,y:RY.c-6,width:cx(17)-cx(3)+10,height:RY.h-RY.c+12,rx:3,fill:'#1f2a44',stroke:'#0d1220'});
+  E('text',{x:(cx(3)+cx(17))/2,y:(RY.c+RY.h)/2+3,'font-size':11,fill:'#e9f0fb','text-anchor':'middle'},'ESP32 DevKit');
+  E('rect',{x:46,y:RY.e+2,width:16,height:12,rx:2,fill:'#9aa3ad'});
+  E('text',{x:40,y:RY.e+24,'font-size':8,fill:'#888'},'USB');
+  const pin=(r,c,color,label)=>{E('circle',{cx:cx(c),cy:RY[r],r:3.4,fill:color});E('text',{x:cx(c),y:r==='a'?RY.a-6:RY.j+14,'font-size':8,fill:'#e9f0fb','text-anchor':'middle'},label);};
+  pin('a',3,'#ff7b7b','5V');pin('a',4,'#9aadc5','GND');pin('a',12,'#5ccc91','G32');pin('a',14,'#ff9d2e','G34');
+  pin('j',3,'#ff7b7b','3V3');pin('j',4,'#9aadc5','GND');pin('j',13,'#6ea8ff','G21');pin('j',16,'#efd271','G22');
+  // potentiometer: legs in columns 22/23/24, body bracket above
+  E('rect',{x:cx(22)-6,y:RY.c-18,width:cx(24)-cx(22)+12,height:12,rx:3,fill:'#20303f',stroke:'#9aadc5'});
+  E('text',{x:cx(23),y:RY.c-21,'font-size':9,fill:'#9aadc5','text-anchor':'middle'},'pot');
+  [22,23,24].forEach(c=>{E('line',{x1:cx(c),y1:RY.c-6,x2:cx(c),y2:RY.c,stroke:'#888','stroke-width':1.4});E('circle',{cx:cx(c),cy:RY.c,r:3,fill:'#bbb'});});
+  E('text',{x:cx(22),y:RY.d+10,'font-size':7,fill:'#888','text-anchor':'middle'},'1');
+  E('text',{x:cx(23),y:RY.d+10,'font-size':7,fill:'#888','text-anchor':'middle'},'W');
+  E('text',{x:cx(24),y:RY.d+10,'font-size':7,fill:'#888','text-anchor':'middle'},'2');
+  // button straddles the gap at columns 28 & 30
+  E('rect',{x:cx(28)-5,y:RY.e+3,width:cx(30)-cx(28)+10,height:RY.f-RY.e-6,rx:3,fill:'#333',stroke:'#888'});
+  E('circle',{cx:(cx(28)+cx(30))/2,cy:(RY.e+RY.f)/2,r:7,fill:'#c42232'});
+  [['e',28],['e',30],['f',28],['f',30]].forEach(a=>E('circle',{cx:cx(a[1]),cy:RY[a[0]],r:3,fill:'#bbb'}));
+  E('text',{x:(cx(28)+cx(30))/2,y:RY.e-4,'font-size':8,fill:'#9aadc5','text-anchor':'middle'},'button');
+  // LCD off-board (optional)
+  const lx=cx(NC)+40;
+  E('rect',{x:lx,y:58,width:120,height:72,rx:5,fill:'#141d2a',stroke:'#344154','stroke-dasharray':'4 3'});
+  E('text',{x:lx+60,y:52,'font-size':9,fill:'#9aadc5','text-anchor':'middle'},'QAPASS I\u00B2C LCD (optional)');
+  const lp=[['VCC','#ff7b7b'],['GND','#9aadc5'],['SDA','#6ea8ff'],['SCL','#efd271']];
+  lp.forEach((p,i)=>{const X=lx+22+i*26;E('circle',{cx:X,cy:130,r:3,fill:p[1]});E('text',{x:X,y:144,'font-size':7,fill:'#9aadc5','text-anchor':'middle'},p[0]);});
+  // jumpers
+  const J=(pts,color)=>E('path',{d:'M'+pts.map(p=>p[0]+','+p[1]).join(' L'),fill:'none',stroke:color,'stroke-width':2.4,'stroke-linecap':'round','stroke-linejoin':'round'});
+  J([[cx(3),RY.j],[cx(1.4),RY.j],[cx(1.4),24]],'#ff7b7b');      // 3V3 j3 -> + rail
+  J([[cx(4),RY.j],[cx(2.4),RY.j],[cx(2.4),38]],'#9aadc5');      // GND  j4 -> - rail
+  J([[cx(22),RY.a],[cx(22),24]],'#ff7b7b');                      // pot pin1 -> + rail
+  J([[cx(23),RY.a],[cx(23),RY.a-9],[cx(14),RY.a-9],[cx(14),RY.a]],'#ff9d2e'); // pot wiper -> G34 (a14)
+  J([[cx(24),RY.a],[cx(25.3),RY.a],[cx(25.3),38]],'#6ea8ff');    // pot pin2 -> - rail (blue hop)
+  J([[cx(28),RY.a],[cx(28),RY.a-13],[cx(12),RY.a-13],[cx(12),RY.a]],'#5ccc91'); // button -> G32 (a12)
+  J([[cx(28),RY.j],[cx(31),RY.j],[cx(31),38]],'#9aadc5');        // button -> - rail
+  J([[lx+22,130],[lx+22,24],[cx(32),24]],'#ff7b7b');             // LCD VCC -> + rail
+  J([[lx+48,130],[lx+48,38],[cx(33),38]],'#9aadc5');             // LCD GND -> - rail
+  J([[lx+74,130],[lx+74,RY.j+6],[cx(13),RY.j+6],[cx(13),RY.j]],'#6ea8ff'); // LCD SDA -> G21 j13
+  J([[lx+100,130],[lx+100,RY.j+10],[cx(16),RY.j+10],[cx(16),RY.j]],'#efd271'); // LCD SCL -> G22 j16
+  // legend
+  E('text',{x:40,y:230,'font-size':9,fill:'#9aadc5'},'Top rails: + = 3V3, \u2212 = GND. Jumper the ESP32 3V3 (j3) to +, and a GND (j4) to \u2212, then everything taps the rails.');
+  E('text',{x:40,y:243,'font-size':9,fill:'#9aadc5'},'pot: pin1\u2192+ rail, wiper\u2192G34, pin2\u2192\u2212 rail. button: one side\u2192G32, other\u2192\u2212 rail. Colours match the wire nets.');
+})();
+
 </script>
 </body>
 </html>
