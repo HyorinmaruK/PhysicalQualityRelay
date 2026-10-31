@@ -79,11 +79,14 @@ float mapRawToMm(int raw) {
 }
 
 // Average several ADC samples to steady the reading.
+int lastRawAdc = 0;   // most recent averaged raw ADC, printed for calibration
+
 float readPotMm() {
   long acc = 0;
   const int N = 16;
   for (int i = 0; i < N; i++) { acc += analogRead(POT_PIN); delay(2); }
-  return mapRawToMm((int)(acc / N));
+  lastRawAdc = (int)(acc / N);
+  return mapRawToMm(lastRawAdc);
 }
 
 // SOURCE_CALIPER: decode the caliper's 24-bit frame here. Brand-specific; returns NAN
@@ -105,6 +108,10 @@ void emitReading(float mm) {
     Serial.println("# QRM no reading (caliper decode not implemented)");
     return;
   }
+#if READ_SOURCE == SOURCE_POT
+  Serial.print("# adc=");        // comment line (logger ignores it); use it to calibrate
+  Serial.println(lastRawAdc);
+#endif
 #if SEND_FULL_ROW
   Serial.print("QRM,"); Serial.print(FEATURE); Serial.print(",");
   Serial.print(LOCATION); Serial.print(","); Serial.println(mm, 2);

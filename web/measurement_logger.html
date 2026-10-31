@@ -159,16 +159,17 @@ code{background:#0c121b;padding:1px 5px;border-radius:5px}
           <li><b>Solder:</b> solder the board onto a piece of protoboard, or solder a short pigtail harness to the pins you use (GPIO4, GPIO5, GPIO8, GPIO9, 3V3, GND). Only if you want it permanent — the jumper method needs no cutting or soldering.</li>
         </ol>
       </div>
-      <h3>Wire it and test (USB unplugged while wiring)</h3>
-      <ol class="tiny" style="margin:0;padding-left:18px">
-        <li>Wire the three pot pins, then the button. The LCD is optional — skip it for the first test.</li>
-        <li>Multimeter across the pot: the wiper (GPIO4 wire) should read 0 → 3.3 V as you slide it. If it does not, swap pin1/pin2.</li>
-        <li>Plug in USB. Flash <code>esp32_measurement_station.ino</code> with <code>READ_SOURCE = SOURCE_POT</code>. Open Serial Monitor at 115200; you should see <code># QRM ready</code>.</li>
-        <li>Press the button. A number prints each press. Slide the gauge, press again: the number changes.</li>
-        <li>Calibrate: at ≥ 5 known caliper positions, note the printed raw/number, then set <code>ADC_MIN/ADC_MAX</code> and <code>MM_MIN/MM_MAX</code> in the sketch and reflash.</li>
-        <li>In this page (tab 1) click <b>Connect ESP32</b>, pick the port, then press the button — the value lands in the focused field. Click "Add specimen to log".</li>
+      <h3>Power &amp; how to run</h3>
+      <div class="ok">No external power supply needed. The USB cable powers the ESP32, and the pot, button and LCD together draw only tens of milliamps — well within USB. (The external 5 V supply was only for the servo, which you removed.)</div>
+      <ol class="tiny" style="margin:6px 0 0;padding-left:18px">
+        <li>Wire with USB unplugged (pot and button first; LCD optional, skip for the first test).</li>
+        <li>Multimeter check: the wiper (GPIO4 wire) reads 0 → 3.3 V as you slide the gauge; if reversed, swap pot pin1/pin2. The pot's top pin is <b>3V3, never 5V</b> — more than 3.3 V on a GPIO damages it.</li>
+        <li>Arduino IDE: install "esp32 by Espressif" (Boards Manager). Board = <b>ESP32S3 Dev Module</b>. For the N16R8 set Flash Size 16 MB and PSRAM "OPI PSRAM"; if you use the board's native-USB port, also set "USB CDC On Boot: Enabled". Select the serial port that appears.</li>
+        <li>Open <code>esp32_measurement_station.ino</code>, keep <code>READ_SOURCE = SOURCE_POT</code> and <code>USE_LCD = 0</code>, and Upload. If it will not connect, hold <b>BOOT</b>, tap <b>RESET</b>, release BOOT, and upload again.</li>
+        <li>Serial Monitor at 115200 → <code># QRM ready</code>. Press the button: a number prints each press, with a <code># adc=…</code> line. Slide the gauge and the number changes.</li>
+        <li>Calibrate: at ≥ 5 known caliper sizes, record the <code># adc=</code> value, then set <code>ADC_MIN/ADC_MAX</code> and <code>MM_MIN/MM_MAX</code> in the sketch and reflash so the printed mm match the caliper.</li>
+        <li>Auto-log: Web Serial needs a secure context, so serve the page — from the repo folder run <code>python3 -m http.server 8000</code> and open <code>http://localhost:8000/web/measurement_logger.html</code> in Chrome or Edge. <b>Close the Arduino Serial Monitor first</b> (only one app can hold the port). Click <b>Connect ESP32</b>, pick the port, press the button — the value fills the field; then "Add specimen to log".</li>
       </ol>
-      <div class="danger">Never feed more than 3.3 V into any GPIO: the pot's top pin must go to <b>3V3</b>, not 5V/VIN. The ADC is slightly non-linear near 0 V and 3.3 V, which the calibration absorbs.</div>
     </div>
     <div class="panel">
       <h2>Option B — digital caliper data port (precise, advanced)</h2>
