@@ -4,13 +4,13 @@ This guide turns [MANUAL_TRACK_SERVO_SORTER_BUILD_GUIDE.md](MANUAL_TRACK_SERVO_S
 
 Open the interactive version before you build: [`web/manual_track_visualizer.html`](../../web/manual_track_visualizer.html). It opens directly in a browser (double-click the file; no server, camera, or ESP32 needed). It has three tabs:
 
-1. **Virtual line & guided run**: top view of the 800 × 250 mm board, the carrier moving between stations, a decision for Runs A–C plus two failure cases, the servo flap swinging into the three bins, and an ESP32 emulator that copies the logic and messages of `firmware/manual_sorter/esp32_manual_sorter.ino` (15 s expiry, edge-triggered button, held button does not repeat).
+1. **Virtual line & guided run**: top view of the 800 × 250 mm board, the carrier moving between stations, a decision for Runs A–D plus two failure cases, the servo flap swinging into the three bins, and an ESP32 emulator that copies the logic and messages of `firmware/manual_sorter/esp32_manual_sorter.ino` (15 s expiry, edge-triggered button, held button does not repeat).
 2. **Wiring, step by step**: the same 15 connection steps as section 3 below, one wire at a time, plus an optional overlay of forbidden connections.
 3. **What is real today**: which parts of the flow exist in the repository and which are still planned.
 
 The visualizer is a training aid. It produces no evidence, and its decision thresholds are placeholders.
 
-For the physical build itself, open [`web/physical_build_guide.html`](../../web/physical_build_guide.html). It shows the breadboard hole by hole with each jumper's type, a 3D-style view of the whole bench with every cable (manual track, gravity chute, or motorized belt for comparison), a side view of the exit and swivel chute, a recordable bench test (36 tests, CSV export), a parts list, and what to 3D print.
+For the physical build itself, open [`web/physical_build_guide.html`](../../web/physical_build_guide.html). It shows the breadboard hole by hole with each jumper's type, a 3D-style view of the whole bench with every cable (manual track, gravity chute, or motorized belt for comparison), a side view of the exit and swivel chute, a recordable bench test (41 tests, CSV export), a parts list (what to use, get, and leave in the box), and what to 3D print. The breadboard tab can switch between the two servo power options in section 3.
 
 ## Scope
 
@@ -26,18 +26,38 @@ What the repository supports today: the specimens, the servo firmware, and this 
 
 ## 0. What to 3D print
 
-Required: the 9 specimens in `examples/cad/stl/` (list in section 1). Print them flat in white/light PLA, one batch, same settings: 0.2 mm layers, 3–4 walls, 20–40% infill, no supports, no scaling, no brim (or remove it fully). Measure widths at mid-height. Record printer, nozzle, material, and layer height.
+Required: the 9 specimens in `examples/cad/stl/` (list in section 1): the 7 original files plus 2 seeded-defect files. An earlier version of this guide counted 9 because it included a spare `S-RISK` and `T-RISK`; those spares are optional.
+
+The defect files were generated with [`examples/cad/generate_specimen_stl.py`](../../examples/cad/generate_specimen_stl.py) (Python standard library only), which follows the same geometry as `examples/cad/qualityrelay_printkit.scad`; the SCAD file now also has `slot_defect` and `tab_defect` parts. To re-check every STL against `print_manifest.csv` and print the clearance matrix:
+
+```bash
+python3 examples/cad/generate_specimen_stl.py check
+```
+
+Print them flat in white/light PLA, one batch, same settings: 0.2 mm layers, 3–4 walls, 20–40% infill, no supports, no scaling, no brim (or remove it fully). Measure widths at mid-height. Record printer, nozzle, material, and layer height.
 
 Optional: carrier, track sections, caliper blocks, swivel chute, servo mount. The repository has no CAD for these; cardboard, foam board, or wood work fine. Sizes are in `web/physical_build_guide.html`, tab 5.
 
 ## 1. Prepare specimens (before any wiring)
 
-1. Print from `examples/cad/stl/`: `slot_good_21p20` ×1, `slot_nominal_21p00` ×1, `slot_risk_20p70` ×2, `tab_good_19p80` ×1, `tab_nominal_20p00` ×1, `tab_risk_20p30` ×2, `repeatability_bar_20p00` ×1.
-2. Label each part with a black marker using the IDs from `examples/cad/print_manifest.csv`: `S-GOOD`, `S-NOM`, `S-RISK`, `T-GOOD`, `T-NOM`, `T-RISK`, `RPT-20`. Add `-2` to the backup risk parts.
-3. Pick the three live specimens:
+1. Print one of each from `examples/cad/stl/`: `slot_good_21p20`, `slot_nominal_21p00`, `slot_risk_20p70`, `tab_good_19p80`, `tab_nominal_20p00`, `tab_risk_20p30`, `repeatability_bar_20p00`, `slot_defect_19p40`, `tab_defect_21p60`. Optional spares: a second `slot_risk_20p70` and `tab_risk_20p30`.
+2. Label each part with a black marker using the IDs from `examples/cad/print_manifest.csv`: `S-GOOD`, `S-NOM`, `S-RISK`, `T-GOOD`, `T-NOM`, `T-RISK`, `RPT-20`, `S-DEF`, `T-DEF`. Add `-2` to spare risk parts. Label the defect parts immediately: they look almost the same as the good parts.
+3. Pick the live specimens:
    - Run A: `S-GOOD` with pair `T-GOOD` (CAD clearance 1.40 mm).
    - Run B: `S-RISK` with pair `T-RISK` (CAD clearance 0.40 mm).
    - Run C: `T-NOM` with a clearly disclosed visual-anomaly marker (for example a small black sticker). Label it `T-NOM-ANOM`. Call it an anomaly-detection fixture, not a real defect.
+   - Run D: `S-DEF` with `T-NOM` (CAD interference 0.60 mm), or `S-DEF` with `T-DEF` (2.20 mm). Call them seeded defect specimens: they are designed undersize/oversize, not real manufacturing defects.
+
+   CAD clearance (slot gap − tab width, mm; negative = cannot fit), measured from the STL files:
+
+   | slot \ tab | T-GOOD 19.80 | T-NOM 20.00 | T-RISK 20.30 | T-DEF 21.60 |
+   |---|---:|---:|---:|---:|
+   | S-GOOD 21.20 | +1.40 | +1.20 | +0.90 | −0.40 |
+   | S-NOM 21.00 | +1.20 | +1.00 | +0.70 | −0.60 |
+   | S-RISK 20.70 | +0.90 | +0.70 | +0.40 | −0.90 |
+   | S-DEF 19.40 | −0.40 | −0.60 | −0.90 | −2.20 |
+
+   FDM printing usually makes slots slightly narrower and tabs slightly wider than CAD, so printed clearance tends to be smaller. Measure and fit-test the printed parts before the runs (bench test phase S in `web/physical_build_guide.html`).
 4. Repeatability screen: measure `RPT-20` ten times, re-seating it each time. Write down the spread (max − min). Use this as your uncertainty value.
 
 ## 2. Build the mechanical line
@@ -64,13 +84,24 @@ Mark these positions on the baseboard (distance from the left edge):
 
 Everything stays unplugged until step 12. The step numbers match the visualizer's wiring tab.
 
+### Servo power: use the ELEGOO Power MB V2
+
+No 5 V adapter is needed. The ELEGOO Power MB V2 breadboard module makes 5 V from its barrel-jack input: the kit's 9 V battery clip, or a 6.5–9 V DC adapter with a 5.5 × 2.1 mm centre-positive plug. Its [datasheet](http://eeshop.unl.edu/pdf/mb-v2%20datasheet.pdf) lists a 700 mA maximum output and independent 3.3 V / OFF / 5 V jumpers for each side.
+
+- Press it onto the right end of the breadboard so its pins go into both rail pairs: + pins on the red lines, − pins on the blue lines.
+- Jumper on the side feeding the top rails: **5V**. Other side: **OFF**. Never 3.3 V on the servo rail.
+- Leave its USB socket empty. That socket is an output, so never connect it to the laptop.
+- Keep it switched off until step 14. Plugging it in replaces steps 2 and 3 below.
+- 700 mA is below the 1 A the build guide asks for. It is enough for one SG90 turning a light card chute that never jams. If the servo stutters or the module gets hot, check the chute for binding, fit a fresh battery, or use the alternative below.
+
+Alternative: a USB phone wall charger (Output 5 V, at least 1 A, USB-A port) and a USB lead with two loose ends. Use either a USB-A breakout board with F–M jumpers from VBUS and GND, or an old USB cable cut open (red = +5 V, black = GND, data wires taped, male pins crimped or soldered on). These are W7 (red, top + rail col 52) and W8 (black, top − rail col 53). Do not take servo power from the laptop or the hub. A charger with only USB-C ports gives 0 V on a cut USB-C cable.
+
 Jumper types for the recommended layout (ESP32 pressed into the breadboard in rows b and i, columns 3–17, USB to the left):
 
 | ID | Jumper | From | To |
 |---|---|---|---|
-| W7 | M–M red | DC jack adapter + terminal | top + rail, col 52 |
-| W8 | M–M black | DC jack adapter − terminal | top − rail, col 53 |
-| C1 | capacitor legs | long leg: top + rail col 47 | stripe leg: top − rail col 47 |
+| PM | Power MB V2 pins | right end of the breadboard | both rail pairs (top jumper 5V, bottom OFF) |
+| C1 | capacitor legs (optional) | long leg: top + rail col 47 | stripe leg: top − rail col 47 |
 | W1 | M–M black | a4 (ESP32 GND) | top − rail, col 36 |
 | W4 | M–M brown | servo plug brown socket | top − rail, col 44 |
 | W3 | M–M red | servo plug red socket | top + rail, col 42 |
@@ -79,15 +110,15 @@ Jumper types for the recommended layout (ESP32 pressed into the breadboard in ro
 | W5 | M–M green | a12 (ESP32 D32) | j22 |
 | W6 | M–M black | a24 | top − rail, col 38 |
 
-That is 8 male–male jumpers. If the ESP32 does not fit on the breadboard with row a free, leave it off the board and use male–female jumpers for W1, W2, and W5 (socket end on the ESP32 pin). Female–female jumpers are not needed. Column numbers assume a 30-pin DEVKIT V1; follow the printed pin labels on your board.
+That is 6 male–male jumpers (W1–W6). The USB charger alternative adds W7 and W8. If the ESP32 does not fit on the breadboard with row a free, leave it off the board and use male–female jumpers for W1, W2, and W5 (socket end on the ESP32 pin). Female–female jumpers are not needed. Column numbers assume a 30-pin DEVKIT V1; follow the printed pin labels on your board.
 
 | Step | From | To | Why | Check before moving on |
 |---:|---|---|---|---|
 | 0 | — | — | Unplug USB and the servo supply. Remove the flap. | Supply OFF, USB out. |
 | 1 | ESP32 | Breadboard, across the center gap | Each pin gets its own row | No pins shorted across the gap |
-| 2 | Servo supply **+** | Breadboard **+** rail | Servo power comes only from the external supply | Multimeter: voltage matches the servo label (5 V for SG90/MG90). Supply rated ≥ 1 A, 2 A preferred |
+| 2 | Servo supply **+** | Breadboard **+** rail | Servo power comes only from the external supply | Power MB V2: steps 2 and 3 happen when you plug it in. Later, 4.75–5.25 V on the top rails (bench test P1) |
 | 3 | Servo supply **−** | Breadboard **−** rail | Servo return | Polarity correct |
-| 4 | Capacitor 470–1000 µF | Long leg to **+** rail, stripe leg to **−** rail, near the servo | Reduces voltage dips | Stripe on **−**. A reversed electrolytic capacitor can fail violently |
+| 4 | Capacitor 470–1000 µF (optional, skip if you have none) | Long leg to **+** rail, stripe leg to **−** rail, near the servo | Reduces voltage dips | Stripe on **−**. A reversed electrolytic capacitor can fail violently |
 | 5 | **−** rail | ESP32 **GND** | Common signal reference. Only ground is shared | Continuity between supply − and ESP32 GND |
 | 6 | Servo brown/black | **−** rail | Servo ground | Check your servo's colour code |
 | 7 | Servo red | **+** rail | Servo power | Red goes to the external supply only, never to ESP32 3V3, 5V/VIN, or a GPIO |
@@ -166,7 +197,7 @@ Decision rules (conservative, applied by hand today):
 
 - **HOLD** if anything is missing, blurred, inconsistent, or uncertain: fewer than 3 readings, a large repeatability spread, an OCR candidate that differs from your confirmed number, a missing or unusable Webcam B image, the same image used for both cameras, a fit result that is FAIL or INDETERMINATE or absent.
 - **PASS** only when all evidence is present and consistent, the fit is PASS, and a named person authorizes release.
-- **REJECT** only when a person has confirmed the nonconformance by looking at the part. A camera result alone means HOLD.
+- **REJECT** only when a person has confirmed the nonconformance on the part itself (by looking at it, or by a failed fit test with an out-of-tolerance reading). A camera result alone means HOLD.
 
 Expected outcomes:
 
@@ -175,6 +206,7 @@ Expected outcomes:
 | A | `S-GOOD` + `T-GOOD` | PASS (after human authorization) | Consistent readings, clear image, fit PASS |
 | B | `S-RISK` + `T-RISK` | HOLD | Dimensions plausible, but fit is tight/INDETERMINATE |
 | C | `T-NOM-ANOM` | REJECT if a person confirms the anomaly, otherwise HOLD | Visual candidate alone cannot cause REJECT |
+| D | `S-DEF` + `T-NOM` (or + `T-DEF`) | REJECT if a person confirms, otherwise HOLD | Width far outside nominal and fit FAIL; the webcam alone would not catch it |
 
 ## 8. Failure demonstrations (after Runs A–C work)
 
@@ -202,6 +234,9 @@ The visualizer shows each of these.
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | ESP32 reboots when the servo moves | Servo powered from the ESP32, or supply too weak | Servo on external supply; add the capacitor; 2 A supply |
+| Top rails read about 0 V | Power MB V2 switched off, jumper on OFF, flat battery, or a USB-C charger with a cut USB-C cable | Switch on; servo-side jumper on 5V; fresh battery; use a USB-A charger port |
+| Negative voltage on the rails | Power MB V2 plugged in backwards, or USB lead wires swapped | Switch off, turn the module around (+ on the red line) or swap the wires |
+| Servo stutters, module gets hot | Chute binding, weak 9 V battery, or more than 700 mA drawn | Free the chute; fresh battery or 9 V adapter; USB charger lead |
 | Servo jitters at rest | Missing common ground or noisy supply | Check step 5 wiring; shorten servo wires |
 | Servo does not move at all | Signal on the wrong pin, supply off, or ESP32Servo missing | Verify GPIO13 and the supply; reinstall ESP32Servo |
 | Button never registers | Wrong pin or both wires on the same side of a tactile button | Use diagonal legs; verify GPIO32 exists on your board |

@@ -84,6 +84,7 @@ td select{min-width:92px}
         <button class="primary" id="bNext">Next ▶</button>
         <button class="ghost" id="bAll">Show finished board</button>
         <span class="seg" id="layoutSeg"><button data-l="A" class="on">Layout A: ESP32 on breadboard</button><button data-l="B">Layout B: ESP32 off breadboard</button></span>
+        <span class="seg" id="powerSeg"><button data-p="module" class="on">Servo power: ELEGOO Power MB V2</button><button data-p="usb">USB charger lead</button></span>
       </div>
       <div class="tiny" style="margin-top:6px">Drawn for a standard 830-hole breadboard (columns 1–63, rows a–j) and a 30-pin "ESP32 DEVKIT V1" (DOIT style), lying sideways with USB to the left. Other ESP32 boards have different pin orders: always match the <b>printed label</b> (GND, D13 / G13 / IO13, D32 / G32 / IO32), not the drawing position.</div>
     </div>
@@ -180,22 +181,24 @@ td select{min-width:92px}
 
 <section id="print" class="view">
   <div class="panel">
-    <h2>Yes: you must 3D print the test specimens. Everything else is optional.</h2>
-    <p class="muted" style="margin:0">The specimens are the "products" that move through the line, so they have to be printed. The track, carrier, chute and mounts can be printed too, but cardboard, foam board, or wood strips work just as well. The repository has STL files only for the specimens; it has no CAD for the carrier, rails, chute, or brackets yet.</p>
+    <h2>3D print the specimens. The 7 files are enough; 2 seeded-defect files are new.</h2>
+    <p class="muted" style="margin:0">The repository has 7 original STL files. My earlier count of 9 included a spare S-RISK and a spare T-RISK; those spares are optional. Two new files, <code>slot_defect_19p40.stl</code> and <code>tab_defect_21p60.stl</code>, are deliberately out of tolerance so they cannot fit any mating part. Print 7 + 2 = 9 parts. The track, carrier, chute, and mounts can be cardboard or wood; the repository has no CAD for them.</p>
   </div>
   <div class="cols2">
     <div class="panel">
-      <h2>Required: specimens (STL files in <code>examples/cad/stl/</code>)</h2>
+      <h2>Specimens (<code>examples/cad/stl/</code>)</h2>
       <table><thead><tr><th>file</th><th>qty</th><th>label</th><th>CAD width</th><th>used in</th></tr></thead><tbody>
         <tr><td>slot_good_21p20.stl</td><td>1</td><td>S-GOOD</td><td>21.20 mm slot</td><td>Run A</td></tr>
-        <tr><td>tab_good_19p80.stl</td><td>1</td><td>T-GOOD</td><td>19.80 mm tab</td><td>Run A (pair with S-GOOD, 1.40 mm clearance)</td></tr>
-        <tr><td>slot_risk_20p70.stl</td><td>2</td><td>S-RISK, S-RISK-2</td><td>20.70 mm slot</td><td>Run B (1 + backup)</td></tr>
-        <tr><td>tab_risk_20p30.stl</td><td>2</td><td>T-RISK, T-RISK-2</td><td>20.30 mm tab</td><td>Run B (pair with S-RISK, 0.40 mm clearance)</td></tr>
-        <tr><td>tab_nominal_20p00.stl</td><td>1</td><td>T-NOM → T-NOM-ANOM</td><td>20.00 mm tab</td><td>Run C (add a disclosed anomaly marker)</td></tr>
-        <tr><td>slot_nominal_21p00.stl</td><td>1</td><td>S-NOM</td><td>21.00 mm slot</td><td>reference image, OCR-mismatch demo</td></tr>
-        <tr><td>repeatability_bar_20p00.stl</td><td>1</td><td>RPT-20</td><td>20.00 mm bar</td><td>test R1: 10-reading repeatability</td></tr>
+        <tr><td>tab_good_19p80.stl</td><td>1</td><td>T-GOOD</td><td>19.80 mm tab</td><td>Run A</td></tr>
+        <tr><td>slot_risk_20p70.stl</td><td>1 (+1 optional spare)</td><td>S-RISK</td><td>20.70 mm slot</td><td>Run B</td></tr>
+        <tr><td>tab_risk_20p30.stl</td><td>1 (+1 optional spare)</td><td>T-RISK</td><td>20.30 mm tab</td><td>Run B</td></tr>
+        <tr><td>tab_nominal_20p00.stl</td><td>1</td><td>T-NOM</td><td>20.00 mm tab</td><td>Run C (add a disclosed sticker marker), mate for S-DEF</td></tr>
+        <tr><td>slot_nominal_21p00.stl</td><td>1</td><td>S-NOM</td><td>21.00 mm slot</td><td>reference image, mate for T-DEF</td></tr>
+        <tr><td>repeatability_bar_20p00.stl</td><td>1</td><td>RPT-20</td><td>20.00 mm bar</td><td>repeatability test R1</td></tr>
+        <tr class="hl"><td><b>slot_defect_19p40.stl</b> (new)</td><td>1</td><td>S-DEF</td><td>19.40 mm slot, 1.60 mm undersize</td><td>Run D</td></tr>
+        <tr class="hl"><td><b>tab_defect_21p60.stl</b> (new)</td><td>1</td><td>T-DEF</td><td>21.60 mm tab, 1.60 mm oversize</td><td>Run D</td></tr>
       </tbody></table>
-      <p class="tiny">9 parts in total, each 60 mm long and 6 mm high. Labels come from <code>examples/cad/print_manifest.csv</code>.</p>
+      <p class="tiny">Every part is 60 mm long and 6 mm high; only the critical width differs. Labels follow <code>examples/cad/print_manifest.csv</code>. Label S-DEF and T-DEF as soon as they come off the printer: they look almost the same as the good parts, and a webcam cannot reliably see a 1.6 mm width difference.</p>
       <h3>Print settings</h3>
       <ul>
         <li>Material: white or light PLA (contrast with the dark vision pad). Print all 9 in one batch with the same printer, nozzle, and settings.</li>
@@ -204,10 +207,25 @@ td select{min-width:92px}
         <li>No brim if you can avoid it. If you need one, remove it completely: it changes the measured width.</li>
         <li>Do not scale the files. Turn off any "XY size compensation" you have not calibrated, or record its value.</li>
         <li>Measure widths at mid-height, not at the bottom edge (first-layer "elephant's foot" makes the bottom wider).</li>
-        <li>Write printer, nozzle, material, layer height, and date in the run log notes. The printed size will differ from the CAD size; that difference is part of what you measure.</li>
+        <li>Write printer, nozzle, material, layer height, and date in the run log notes.</li>
       </ul>
     </div>
     <div class="panel">
+      <h2>Which slot fits which tab (CAD clearance, mm)</h2>
+      <table><thead><tr><th>slot \ tab</th><th>T-GOOD 19.80</th><th>T-NOM 20.00</th><th>T-RISK 20.30</th><th>T-DEF 21.60</th></tr></thead><tbody>
+        <tr><td><b>S-GOOD 21.20</b></td><td class="res-PASS">+1.40</td><td class="res-PASS">+1.20</td><td class="res-PASS">+0.90</td><td class="res-FAIL">−0.40</td></tr>
+        <tr><td><b>S-NOM 21.00</b></td><td class="res-PASS">+1.20</td><td class="res-PASS">+1.00</td><td class="res-PASS">+0.70</td><td class="res-FAIL">−0.60</td></tr>
+        <tr><td><b>S-RISK 20.70</b></td><td class="res-PASS">+0.90</td><td class="res-PASS">+0.70</td><td style="color:var(--warn);font-weight:700">+0.40 tight</td><td class="res-FAIL">−0.90</td></tr>
+        <tr><td><b>S-DEF 19.40</b></td><td class="res-FAIL">−0.40</td><td class="res-FAIL">−0.60</td><td class="res-FAIL">−0.90</td><td class="res-FAIL">−2.20</td></tr>
+      </tbody></table>
+      <p class="tiny">Clearance = slot gap − tab width. Positive fits by design; negative is interference and cannot fit. The values were measured from the STL triangles with <code>python3 examples/cad/generate_specimen_stl.py check</code>. FDM printers usually print slots a little narrower and tabs a little wider than CAD, so printed interference tends to be larger and printed clearance smaller. Measure and fit-test the printed parts (bench test phase S).</p>
+      <h3>Run D: seeded defect pair</h3>
+      <ul>
+        <li>Use S-DEF with T-NOM (or S-NOM with T-DEF, or S-DEF with T-DEF).</li>
+        <li>The caliper reading is far outside nominal and the tab does not slide in: fit FAIL.</li>
+        <li>A person confirms the nonconformance, then you stage R and the part goes to REJECT. Without that confirmation, the route is HOLD.</li>
+        <li>Call them seeded defect specimens. They are designed undersize/oversize, not real manufacturing defects.</li>
+      </ul>
       <h2>Optional: fixtures (print or make by hand)</h2>
       <table><thead><tr><th>part</th><th>size</th><th>no-printer alternative</th></tr></thead><tbody>
         <tr><td><b>Carrier</b></td><td>≈ 75 × 45 mm plate, 2–3 mm thick, 3–5 mm lip on 3 sides, front open, arrow on top</td><td>Foam board or thick card with glued strips</td></tr>
@@ -225,17 +243,9 @@ td select{min-width:92px}
 
 <!-- =============================== BOM =============================== -->
 <section id="bom" class="view">
-  <div class="cols2" style="margin-top:0">
-    <div class="panel">
-      <h2>Jumpers and small parts for the sorter board</h2>
-      <table id="bomTable"><thead><tr><th>item</th><th>Layout A</th><th>Layout B</th><th>notes</th></tr></thead><tbody></tbody></table>
-      <div class="note">Buy or take from the kit at least double the count: jumpers get loose, and a spare set lets you rebuild quickly.</div>
-    </div>
-    <div class="panel">
-      <h2>Cables and bench equipment</h2>
-      <table id="bom2"><thead><tr><th>item</th><th>qty</th><th>connects</th></tr></thead><tbody></tbody></table>
-    </div>
-  </div>
+  <div class="panel"><h2>What to use, what to get, what to leave in the box</h2>
+    <p class="muted" style="margin:0">Based on what you have: two ESP32 boards, the ELEGOO kit with the Power MB V2, two Logitech webcams, a laptop, and a 3D printer. Optional items are skipped. You said you can find cables, so they are listed without models.</p></div>
+  <div id="bomGroups"></div>
 </section>
 </main>
 
@@ -258,13 +268,15 @@ const TOP_PINS=['VIN','GND','D13','D12','D14','D27','D26','D25','D33','D32','D35
 const BOT_PINS=['3V3','GND','D15','D2','D4','RX2','TX2','D5','D18','D19','D21','RX0','TX0','D22','D23'];
 const SERVO_SOCK={orange:[474,-14],red:[487,-14],brown:[500,-14]};
 const JACK={plus:[905,-34],minus:[945,-34]};
-let layout='A';
+let layout='A',power='module';
+const V=x=>typeof x==='function'?x():x;
 function wires(){
   const B=layout==='B';
   const esp=(pin)=>B?ESPB[pin]:hole('a',{GND:4,D13:5,D32:12}[pin]);
   return [
-    {id:'W7',step:2,type:'M–M',color:'#d93a3a',cname:'red',from:JACK.plus,to:hole('T+',52),fromT:'DC jack adapter "+" screw terminal',toT:'top + rail, column 52',why:'5 V servo supply into the + rail'},
-    {id:'W8',step:2,type:'M–M',color:'#3b3b3b',cname:'black',from:JACK.minus,to:hole('T-',53),fromT:'DC jack adapter "−" screw terminal',toT:'top − rail, column 53',why:'Supply return into the − rail'},
+    ...(power==='usb'?[
+    {id:'W7',step:2,type:'USB lead wire',color:'#d93a3a',cname:'red',from:JACK.plus,to:hole('T+',52),fromT:'USB power lead, red wire (+5 V)',toT:'top + rail, column 52',why:'5 V servo supply into the + rail'},
+    {id:'W8',step:2,type:'USB lead wire',color:'#3b3b3b',cname:'black',from:JACK.minus,to:hole('T-',53),fromT:'USB power lead, black wire (GND)',toT:'top − rail, column 53',why:'Supply return into the − rail'}]:[]),
     {id:'W1',step:4,type:B?'F–M':'M–M',color:'#3b3b3b',cname:'black',from:esp('GND'),to:hole('T-',36),fromT:B?'ESP32 GND pin (socket end)':'hole a4 (ESP32 GND)',toT:'top − rail, column 36',why:'Common ground: the only link between the ESP32 and the servo supply'},
     {id:'W4',step:5,type:'M–M',color:'#8b5a2b',cname:'brown',from:SERVO_SOCK.brown,to:hole('T-',44),fromT:'servo plug brown/black socket',toT:'top − rail, column 44',why:'Servo ground'},
     {id:'W3',step:6,type:'M–M',color:'#d93a3a',cname:'red',from:SERVO_SOCK.red,to:hole('T+',42),fromT:'servo plug red socket',toT:'top + rail, column 42',why:'Servo +5 V from the external supply only'},
@@ -274,11 +286,15 @@ function wires(){
   ];
 }
 const ESPB={GND:[189,352],D13:[213,352],D32:[381,352]}; // layout B: ESP32 lying below the breadboard, pins facing up
+const MOD_TEXT=`You have this module, so no 5 V adapter is needed. Press the <b>ELEGOO Power MB V2</b> onto the <b>right end</b> of the breadboard so its pins go into both pairs of power rails, with its <b>+</b> pins on the red lines and <b>−</b> pins on the blue lines. Put the jumper on the side that feeds the <b>top rails on 5V</b> and the other jumper on <b>OFF</b> (the bottom rails stay unused). Plug the kit's 9 V battery clip (barrel plug), or a 6.5–9 V DC adapter with a 5.5 × 2.1 mm centre-positive plug, into the module's barrel jack. Leave the module switched off and its USB socket empty.`;
+const MOD_WARN=`Never put the servo-side jumper on 3.3 V. The USB socket on the module is an output: do not connect it to the laptop. The module is rated 700 mA, below the 1 A the build guide asks for. That is enough for one SG90 turning a light card chute, not for a jammed or larger servo: if the servo stutters or the module gets hot, check the chute for binding, fit a fresh battery, or use the USB charger lead (toggle above).`;
+const USB_TEXT=`Use this only if the Power MB V2 has no battery or adapter. Power comes from a <b>USB phone charger</b> (label: Output 5 V, at least 1 A) through a USB lead with two loose ends: either a <b>USB-A breakout board</b> plugged into the charger, with F–M jumpers from its VBUS (+5 V) and GND pins, or an <b>old USB cable</b> with its USB-A plug kept and the other end cut off: red = +5 V, black = GND, trim and tape the green and white data wires, and crimp or solder a male pin on red and black (bare stranded wire does not hold in a breadboard). Red into the <b>top + rail</b> (column 52), black into the <b>top − rail</b> (column 53). Keep the charger unplugged until step 13.`;
+const USB_WARN=`Use a wall charger, not the laptop or the hub: servo current spikes can make the webcams drop out. A charger with only USB-C ports gives 0 V on a cut USB-C cable; use a USB-A port. Wire colours inside cut cables are not always standard: check polarity with the multimeter (bench test P1) before you connect the servo.`;
 const BSTEPS=[
-  {t:'Unplug everything',b:'USB cable out, 5 V adapter out of the wall, servo flap/chute removed. Look along the top rail lines: if the red/blue line has a break in the middle, your rails are split. Then add a short M–M jumper across the break on both the + and − rails, or keep all rail connections on the right half (columns 36–62, as drawn).'},
+  {t:'Unplug everything',b:'USB cable out, servo power off (Power MB V2 switched off and battery unplugged, or USB charger out of the wall), servo flap/chute removed. Look along the top rail lines: if the red/blue line has a break in the middle, your rails are split. Then add a short M–M jumper across the break on both the + and − rails, or keep all rail connections on the right half (columns 36–62, as drawn).'},
   {t:'Place the ESP32',b:'Layout A: press the ESP32 into the breadboard so its two pin rows sit in <b>row b</b> and <b>row i</b>, columns 3–17, USB end hanging over the left edge. Rows a and j stay free: hole a4 now connects to GND, a5 to D13, a12 to D32. Press evenly on both pin rows. If your ESP32 is too wide to leave row a free, use Layout B.',show:['esp']},
-  {t:'DC jack adapter (W7, W8)',b:'Screw a red M–M jumper into the "+" terminal and a black M–M jumper into the "−" terminal of the 5.5 × 2.1 mm DC jack adapter. Push red into the <b>top + rail</b> (column 52) and black into the <b>top − rail</b> (column 53). Do not plug the adapter into the wall yet.',show:['jack','W7','W8'],warn:'Check the adapter label: output must be 5 V DC (for SG90/MG90), at least 1 A (2 A better). A 9 V or 12 V adapter here will destroy the servo.'},
-  {t:'Capacitor C1',b:'470–1000 µF, 10 V or higher. Long leg into the top + rail at column 47, short leg (the side with the stripe) into the top − rail at column 47. No jumper needed.',show:['cap'],warn:'Electrolytic capacitors are polarized. Stripe = −. Reversed, they can burst.'},
+  {t:()=>power==='usb'?'USB charger power lead (W7, W8)':'Servo power: ELEGOO Power MB V2',b:()=>power==='usb'?USB_TEXT:MOD_TEXT,show:()=>power==='usb'?['jack','W7','W8']:['module'],warn:()=>power==='usb'?USB_WARN:MOD_WARN},
+  {t:'Capacitor C1 (optional)',b:'Skip this step if you have no suitable capacitor; the sorter works without it. If you have one of 100 µF or more, rated 10 V or higher: long leg into the top + rail at column 47, short leg (the side with the stripe) into the top − rail at column 47. No jumper needed.',show:['cap'],warn:'Electrolytic capacitors are polarized. Stripe = −. Reversed, they can burst.'},
   {t:'Common ground (W1)',b:'Black jumper from <b>a4</b> (ESP32 GND) to the <b>top − rail</b>, column 36. This is the only wire between the ESP32 and the servo supply side.',show:['W1']},
   {t:'Servo ground (W4)',b:'Push the pin of a brown (or black) M–M jumper into the servo plug socket on the <b>brown/black</b> wire. Other end into the <b>top − rail</b>, column 44.',show:['servo','W4']},
   {t:'Servo power (W3)',b:'Red M–M jumper from the servo plug <b>red</b> socket to the <b>top + rail</b>, column 42.',show:['W3'],warn:'The red servo wire must never go to the ESP32 3V3, VIN, 5V, or any GPIO pin.'},
@@ -288,13 +304,13 @@ const BSTEPS=[
   {t:'Button to ground (W6)',b:'Black M–M jumper from <b>a24</b> (same column as button leg e24, top half) to the <b>top − rail</b>, column 38.',show:['W6']},
   {t:'Check with a multimeter (power off)',b:'Continuity (beep) mode:<br>1. Top − rail ↔ ESP32 GND pin: beep.<br>2. Top + rail ↔ top − rail: <b>no</b> beep (it may beep briefly while the capacitor charges, then stop).<br>3. Servo red socket ↔ ESP32 3V3 and VIN: <b>no</b> beep.<br>4. ESP32 D13 pin ↔ servo orange socket: beep.<br>5. ESP32 D32 pin ↔ top − rail: beep only while the button is held.',show:[]},
   {t:'USB data cable',b:'ESP32 USB → powered USB hub (or laptop). Use a cable that carries data: a new serial port must appear (on macOS: <code>/dev/cu.usbserial-…</code> or <code>/dev/cu.SLAB_USBtoUART</code>). Charge-only cables show nothing.',show:['usb']},
-  {t:'Upload, then switch on servo power',b:'Upload <code>firmware/manual_sorter/esp32_manual_sorter.ino</code>, open Serial Monitor at 115200 baud, wait for "QualityRelay sorter ready.", then plug the 5 V adapter into the wall. The servo should go to 90° and hold. Now run phase F of the bench test with the chute still off.',show:[]}
+  {t:'Upload, then switch on servo power',b:'Upload <code>firmware/manual_sorter/esp32_manual_sorter.ino</code>, open Serial Monitor at 115200 baud, wait for "QualityRelay sorter ready.", then switch on servo power (Power MB V2 switch, or USB charger into the wall). The servo should go to 90° and hold. Now run phase F of the bench test with the chute still off.',show:[]}
 ];
 let bStep=0,bAll=false;
 function drawBB(){
   const s=$('#bbSvg');s.innerHTML='';
-  const vis=k=>bAll||BSTEPS.slice(0,bStep+1).some(x=>(x.show||[]).includes(k));
-  const cur=k=>!bAll&&(BSTEPS[bStep].show||[]).includes(k);
+  const vis=k=>bAll||BSTEPS.slice(0,bStep+1).some(x=>(V(x.show)||[]).includes(k));
+  const cur=k=>!bAll&&(V(BSTEPS[bStep].show)||[]).includes(k);
   const grp=(k)=>{const g=el('g',{},s);if(!vis(k))g.setAttribute('class','dim');else if(cur(k))g.setAttribute('class','curEl');return g;};
   // board
   el('rect',{x:52,y:42,width:842,height:240,rx:6,class:'bb'},s);
@@ -329,20 +345,51 @@ function drawBB(){
     for(let i=0;i<15;i++){const x=165+i*24;el('rect',{x:x-3,y:349,width:6,height:6,fill:'#d4af37'},g);
       const hot=['GND','D13','D32'].includes(TOP_PINS[i]);el('text',{x:x,y:336,'text-anchor':'middle',class:'lbls',fill:hot?'#ffd79c':'#9aadc5','font-weight':hot?700:400},g,TOP_PINS[i]);}
   }
-  // DC jack
-  g=grp('jack');
-  el('rect',{x:880,y:-92,width:110,height:52,rx:4,fill:'#222',stroke:'#666'},g);
-  el('circle',{x:0,cx:968,cy:-66,r:9,fill:'#111',stroke:'#888'},g);
-  el('rect',{x:893,y:-48,width:24,height:14,fill:'#2d7d46'},g);el('rect',{x:933,y:-48,width:24,height:14,fill:'#2d7d46'},g);
-  el('text',{x:905,y:-54,'text-anchor':'middle',class:'lbls',fill:'#ff9da0'},g,'+');el('text',{x:945,y:-54,'text-anchor':'middle',class:'lbls'},g,'−');
-  el('text',{x:990,y:-98,'text-anchor':'end',class:'lbls'},g,'DC jack adapter (from 5 V 2 A wall adapter)');
+  // servo power source
+  if(power==='usb'){
+    g=grp('jack');
+    el('rect',{x:930,y:-106,width:60,height:40,rx:6,fill:'#e6e6e6',stroke:'#888'},g);
+    el('rect',{x:944,y:-86,width:32,height:9,rx:1,fill:'#333'},g);
+    el('text',{x:960,y:-93,'text-anchor':'middle',class:'lbld'},g,'5 V ≥ 1 A');
+    el('path',{d:'M960,-77 C960,-58 925,-70 925,-58',stroke:'#555','stroke-width':4,fill:'none'},g);
+    el('rect',{x:893,y:-58,width:64,height:12,rx:3,fill:'#444'},g);
+    el('path',{d:'M905,-46 V-34',stroke:'#d93a3a','stroke-width':3},g);el('path',{d:'M945,-46 V-34',stroke:'#222','stroke-width':3},g);
+    el('text',{x:924,y:-96,'text-anchor':'end',class:'lbls'},g,'USB wall charger, 5 V, at least 1 A');
+    el('text',{x:924,y:-84,'text-anchor':'end',class:'lbls'},g,'lead: red = +5 V, black = GND');
+  }else{
+    g=grp('module');
+    const x0=colX(50)-7,x1=colX(63)+7,cx=(x0+x1)/2;
+    el('rect',{x:x0,y:38,width:x1-x0,height:248,rx:5,fill:'#1d5c2e',stroke:'#0f3a1c',opacity:.95},g);
+    for(const r of ['T+','T-','B+','B-'])for(const c of [59,60])el('rect',{x:colX(c)-3,y:ROWY[r]-3,width:6,height:6,fill:'#d4af37'},g);
+    const header=(y,capIdx,txt,col)=>{el('rect',{x:colX(52)-6,y,width:48,height:14,rx:2,fill:'#111'},g);
+      ['3.3','OFF','5V'].forEach((t,i)=>el('text',{x:colX(52)+1+i*16,y:y+(y<160?24:-4),'text-anchor':'middle',class:'lbls',fill:'#fff'},g,t));
+      el('rect',{x:colX(52)-6+capIdx*16,y:y-2,width:16,height:18,rx:2,fill:col},g);
+      el('text',{x:colX(52)-6,y:y<160?y+38:y+28,class:'lbls',fill:'#fff','font-weight':700},g,txt);};
+    header(88,2,'top: jumper on 5V','#efba71');
+    header(222,1,'bottom: jumper OFF','#9aadc5');
+    el('text',{x:cx,y:140,'text-anchor':'middle',class:'lbl','font-weight':700},g,'ELEGOO');
+    el('text',{x:cx,y:155,'text-anchor':'middle',class:'lbl'},g,'Power MB V2');
+    el('rect',{x:colX(52)-7,y:173,width:14,height:14,rx:2,fill:'#ddd',stroke:'#333'},g);el('text',{x:colX(52),y:200,'text-anchor':'middle',class:'lbls',fill:'#fff'},g,'switch');
+    el('circle',{cx:colX(56),cy:180,r:3.5,fill:'#5ccc91'},g);el('text',{x:colX(56),y:200,'text-anchor':'middle',class:'lbls',fill:'#fff'},g,'LED');
+    el('rect',{x:x1-6,y:124,width:24,height:28,rx:3,fill:'#111',stroke:'#777'},g);
+    el('rect',{x:x1-6,y:166,width:14,height:30,rx:1,fill:'#c8ccd2',stroke:'#777'},g);
+    el('text',{x:x1+12,y:184,class:'lbls'},g,'USB out:');el('text',{x:x1+12,y:195,class:'lbls'},g,'leave empty');
+    el('rect',{x:918,y:20,width:56,height:80,rx:5,fill:'#3b3b3b',stroke:'#888'},g);
+    el('rect',{x:930,y:12,width:12,height:8,fill:'#bbb'},g);el('rect',{x:950,y:12,width:12,height:8,fill:'#bbb'},g);
+    el('text',{x:946,y:64,'text-anchor':'middle',class:'lbl','font-weight':700},g,'9 V');
+    el('path',{d:`M936,12 C936,-10 ${x1+60},90 ${x1+18},134`,stroke:'#d93a3a','stroke-width':2.5,fill:'none'},g);
+    el('path',{d:`M956,12 C956,-16 ${x1+70},96 ${x1+18},140`,stroke:'#222','stroke-width':2.5,fill:'none'},g);
+    el('text',{x:946,y:114,'text-anchor':'middle',class:'lbls'},g,'battery clip →');
+    el('text',{x:946,y:125,'text-anchor':'middle',class:'lbls'},g,'barrel jack');
+    el('text',{x:946,y:-4,'text-anchor':'middle',class:'lbls'},g,'or 6.5–9 V adapter');
+  }
   // capacitor
   g=grp('cap');
   el('line',{x1:colX(47),y1:ROWY['T+'],x2:colX(47)-4,y2:28,stroke:'#ccc','stroke-width':1.6},g);
   el('line',{x1:colX(47),y1:ROWY['T-'],x2:colX(47)+4,y2:28,stroke:'#ccc','stroke-width':1.6},g);
   el('rect',{x:colX(47)-10,y:-6,width:20,height:34,rx:4,fill:'#24324e',stroke:'#aab'},g);
   el('rect',{x:colX(47)+3,y:-6,width:6,height:34,fill:'#cfd6e0'},g);
-  el('text',{x:colX(47)+14,y:12,class:'lbls'},g,'C1 1000 µF (stripe = −)');
+  el('text',{x:colX(47)+14,y:12,class:'lbls'},g,'C1 optional (stripe = −)');
   // servo
   g=grp('servo');
   el('rect',{x:400,y:-104,width:70,height:40,rx:4,fill:'#2d6cdf',stroke:'#9cc0ff'},g);
@@ -384,15 +431,17 @@ function drawBB(){
   }
   // side panel
   const st=BSTEPS[bAll?BSTEPS.length-1:bStep];
-  $('#bTitle').textContent=bAll?'Finished board':`Step ${bStep} of ${BSTEPS.length-1} · ${st.t}`;
-  $('#bBody').innerHTML=bAll?'All connections shown. Compare your board against this drawing hole by hole, then run the multimeter checks (step 11).':st.b+(layout==='B'&&(st.show||[]).some(k=>['W1','W2','W5','esp'].includes(k))?'<div class="note">Layout B: the ESP32 lies off the breadboard (on a foam pad, pins facing up, or in its own small breadboard). The jumpers to its pins have a <b>socket</b> end that slides onto the pin.</div>':'');
-  $('#bWarn').innerHTML=(!bAll&&st.warn)?`<div class="danger">${st.warn}</div>`:'';
+  $('#bTitle').textContent=bAll?'Finished board':`Step ${bStep} of ${BSTEPS.length-1} · ${V(st.t)}`;
+  $('#bBody').innerHTML=bAll?'All connections shown. Compare your board against this drawing hole by hole, then run the multimeter checks (step 11).':V(st.b)+(layout==='B'&&(V(st.show)||[]).some(k=>['W1','W2','W5','esp'].includes(k))?'<div class="note">Layout B: the ESP32 lies off the breadboard (on a foam pad, pins facing up, or in its own small breadboard). The jumpers to its pins have a <b>socket</b> end that slides onto the pin.</div>':'');
+  $('#bWarn').innerHTML=(!bAll&&V(st.warn))?`<div class="danger">${V(st.warn)}</div>`:'';
   // table
   const tb=$('#bTable tbody');tb.innerHTML='';
   const ws=wires();
-  const extra=[{id:'C1',type:'(legs)',cname:'—',fromT:'+ (long leg): top + rail col 47',toT:'− (stripe): top − rail col 47',why:'Smooths servo current spikes',step:3},
+  const extra=[{id:'C1',type:'(legs)',cname:'—',fromT:'+ (long leg): top + rail col 47',toT:'− (stripe): top − rail col 47',why:'Optional: smooths servo current spikes',step:3},
                {id:'SW1',type:'(legs)',cname:'—',fromT:'legs e22, e24',toT:'legs f22, f24',why:'Human confirmation button',step:8},
                {id:'USB',type:'USB data cable',cname:'—',fromT:'ESP32 USB',toT:'hub / laptop',why:'Power + serial for the ESP32',step:12}];
+  if(power==='module')extra.push({id:'PM',type:'(plugs into the rails)',cname:'—',fromT:'ELEGOO Power MB V2 pins',toT:'top and bottom rail pairs, right end',why:'5 V servo supply: top jumper 5V, bottom jumper OFF',step:2},
+    {id:'BAT',type:'battery clip, barrel plug',cname:'—',fromT:'9 V battery (or 6.5–9 V adapter)',toT:'Power MB V2 barrel jack',why:'Input to the power module',step:2});
   for(const w of [...ws,...extra].sort((a,b)=>a.step-b.step)){
     const tr=document.createElement('tr');tr.innerHTML=`<td><b>${w.id}</b></td><td>${esc(w.type)}</td><td>${esc(w.cname)}</td><td>${esc(w.fromT)}</td><td>${esc(w.toT)}</td><td>${esc(w.why)}</td>`;
     if(!bAll&&w.step===bStep)tr.className='hl';tb.appendChild(tr);}
@@ -402,6 +451,7 @@ $('#bPrev').onclick=()=>{if(bAll){bAll=false;bStep=BSTEPS.length-1;}else bStep=M
 $('#bNext').onclick=()=>{if(bAll){bAll=false;bStep=0;}else bStep=Math.min(BSTEPS.length-1,bStep+1);drawBB();};
 $('#bAll').onclick=()=>{bAll=true;drawBB();};
 document.querySelectorAll('#layoutSeg button').forEach(b=>b.onclick=()=>{layout=b.dataset.l;document.querySelectorAll('#layoutSeg button').forEach(x=>x.classList.toggle('on',x===b));drawBB();});
+document.querySelectorAll('#powerSeg button').forEach(b=>b.onclick=()=>{power=b.dataset.p;document.querySelectorAll('#powerSeg button').forEach(x=>x.classList.toggle('on',x===b));drawBB();});
 drawBB();
 
 /* =====================================================================
@@ -470,7 +520,7 @@ const INFO3={
   bins:['Three bins','Small trays ≤ 50 mm high on the table, centred ~130 mm from the servo axis: PASS on the left (back), HOLD straight ahead, REJECT on the right (front), seen looking along the track.'],
   laptop:['Laptop','Runs the Arduino IDE Serial Monitor (today) and the dashboard. Place it so you can read it from the decision mark.'],
   hub:['Powered USB hub','Three data ports: Webcam A, Webcam B, ESP32. Its own power adapter prevents webcams from dropping out.'],
-  psu:['5 V 2 A adapter','Powers only the servo, via the DC jack adapter on the breadboard rails. Plug it in last.'],
+  psu:['Servo power: ELEGOO Power MB V2','The module sits on the right end of the breadboard and feeds only the servo rails (top jumper 5V, bottom jumper OFF). The 9 V battery, or a 6.5–9 V adapter, plugs into its barrel jack. Switch it on last.'],
   belt:['Belt (comparison)','Flexible belt over two rollers.'],motor:['Motor + driver (comparison)','Geared DC motor on the drive roller, DRV8833 driver, separate motor supply.'],estop:['E-stop (comparison)','Latching stop switch that cuts motor power.'],
   pins:['Stop pins (gravity)','Removable pins through the rails hold the carrier at each station. Pull one to let the carrier slide to the next.']
 };
@@ -484,7 +534,7 @@ function drawSys(){
   const blk=(x,y)=>box(s,x,y,0,40,40,zTop(x+20)-12,'#6b5a43');
   blk(10,200);blk(740,200);
   // 5V adapter at back
-  box(s,880,290,0,40,30,25,'#2a2a2a');lab('psu',900,305,25,-20,-40,'5 V 2 A adapter');
+  box(s,880,290,0,40,30,25,'#2a2a2a');lab('psu',900,305,25,-20,-40,'9 V battery → Power MB V2');
   // back pole camB
   box(s,446,236,zTop(450),8,8,300,'#6c7686');
   // lights (back)
@@ -630,7 +680,7 @@ resetSys();
    ===================================================================== */
 const TESTS=[
  {ph:'A · Parts and mechanics (no electricity)',items:[
-  ['A1','','Lay out every part from tab 4. Check the 5 V adapter label and the capacitor voltage (≥ 10 V).','All parts present; adapter says 5 V DC, ≥ 1 A','adapter V/A'],
+  ['A1','','Lay out every part from tab 4. Check the ELEGOO Power MB V2 and its 9 V battery (or 6.5–9 V adapter), or the USB charger label (5 V, at least 1 A).','All parts present; servo power source ready','power source'],
   ['A2','','Push the empty carrier from LOAD to the end and back 10 times.','No jam, rotation, or lift in 10/10 passes','passes OK /10'],
   ['A3','','With a specimen on the carrier, stop at each mark 5 times. Measure how far the carrier edge is from the mark.','Within ±2 mm every time','max offset mm'],
   ['A4','','Place each of the 3 live specimens on the carrier.','Sits flat, no rocking','']]},
@@ -640,11 +690,11 @@ const TESTS=[
   ['W3','H5','Servo red socket ↔ ESP32 3V3 pin, and ↔ ESP32 VIN pin.','No beep on either',''],
   ['W4','','ESP32 D13 pin ↔ servo orange socket.','Beep',''],
   ['W5','','ESP32 D32 pin ↔ top − rail, button released / held.','Released: no beep. Held: beep',''],
-  ['W6','','Capacitor stripe side is in the − rail (visual).','Stripe on −','']]},
+  ['W6','','Capacitor stripe side is in the − rail (visual). Skip if no capacitor is fitted.','Stripe on −, or no capacitor fitted','']]},
  {ph:'P · Power checks (servo plug disconnected first)',items:[
-  ['P1','H5','Plug in the 5 V adapter only. Multimeter DC volts across top + and top − rails.','4.75–5.25 V','measured V'],
-  ['P2','','Unplug adapter. Plug the ESP32 USB cable into the hub/laptop.','Board LED on; a new serial port appears','port name (do not commit)'],
-  ['P3','','Reconnect the servo plug. Plug in the adapter.','No smoke, smell, or heat; servo may twitch once','']]},
+  ['P1','H5','Switch on servo power only (Power MB V2 switch, or charger into the wall). Multimeter DC volts: red probe on the top + rail, black on the top − rail. Then measure the bottom rails.','Top rails 4.75–5.25 V and positive; bottom rails 0 V. A negative reading means + and − are swapped: switch off and fix','measured V'],
+  ['P2','','Switch servo power off. Plug the ESP32 USB cable into the hub/laptop.','Board LED on; a new serial port appears','port name (do not commit)'],
+  ['P3','','Reconnect the servo plug. Switch servo power on.','No smoke, smell, or heat; servo may twitch once','']]},
  {ph:'F · Firmware tests (chute/flap NOT attached)',items:[
   ['F1','H4','Compile and upload esp32_manual_sorter.ino for your exact board.','Upload succeeds; record esp32 core and ESP32Servo versions','versions'],
   ['F2','','Open Serial Monitor at 115200 baud, press EN/RESET.','"QualityRelay sorter ready." appears; horn at 90°',''],
@@ -666,15 +716,21 @@ const TESTS=[
  {ph:'R · Measurement repeatability',items:[
   ['R1','','Measure RPT-20 ten times, re-seating each time.','Record max − min; use it as your uncertainty','spread mm'],
   ['R2','','Measure S-GOOD and T-GOOD three times each.','Spread ≤ R1 spread + 0.02 mm','values']]},
+ {ph:'S · Printed specimens and fit (before the end-to-end runs)',items:[
+  ['S1','','Measure the critical width of all 9 printed specimens at mid-height, 3 readings each (slot: gap between the rails; tab and bar: width).','All readings recorded in the run log','values'],
+  ['S2','','Compare the S1 means of the defect parts with the other printed parts.','S-DEF gap is smaller than every printed tab; T-DEF is wider than every printed slot gap','smallest margin mm'],
+  ['S3','','Fit test S-GOOD + T-GOOD and S-NOM + T-NOM: slide the tab into the slot by hand.','Both slide fully to the base by hand without force',''],
+  ['S4','','Fit test S-DEF + T-NOM, S-NOM + T-DEF, and S-DEF + T-DEF. Push gently, by hand only.','None of the 3 slides fully in without force','depth reached mm']]},
  {ph:'E · End-to-end runs (one log row each in manual_track_run_log.csv)',items:[
   ['E1','H10','Run A (S-GOOD + T-GOOD) three times.','Complete evidence; human-authorized PASS; observed bin PASS 3/3','observed bins'],
   ['E2','H10','Run B (S-RISK + T-RISK) three times.','Fit tight/INDETERMINATE → HOLD 3/3','observed bins'],
   ['E3','H10','Run C (T-NOM-ANOM) three times.','REJECT only when a person confirms; otherwise HOLD','observed bins'],
-  ['E4','','Unplug Webcam B before the vision step.','Decision HOLD; recapture requested',''],
-  ['E5','','Stage PASS, then deliberately put the part into HOLD by hand.','Log shows requested ≠ observed (mismatch recorded)',''],
-  ['E6','H11','Arrival sensor.','Either correlated with the action, or recorded as disabled','enabled / disabled']]}
+  ['E4','','Run D (S-DEF with T-NOM, or S-DEF + T-DEF) three times.','Width out of tolerance and fit FAIL; REJECT only after a person confirms, otherwise HOLD; observed bin REJECT 3/3','observed bins'],
+  ['E5','','Unplug Webcam B before the vision step.','Decision HOLD; recapture requested',''],
+  ['E6','','Stage PASS, then deliberately put the part into HOLD by hand.','Log shows requested ≠ observed (mismatch recorded)',''],
+  ['E7','H11','Arrival sensor.','Either correlated with the action, or recorded as disabled','enabled / disabled']]}
 ];
-const KEY='qr_physical_bench_test_v1';
+const KEY='qr_physical_bench_test_v2';
 let saved={};try{saved=JSON.parse(localStorage.getItem(KEY)||'{}');}catch(e){saved={};}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(saved));}catch(e){}renderSum();}
 function renderTests(){
@@ -716,34 +772,49 @@ renderTests();
 /* =====================================================================
    4. BOM
    ===================================================================== */
-const BOM=[
- ['Male–male jumper, ~10–20 cm','8','5','W1–W8 in Layout A. Two of them are screwed into the DC jack terminals.'],
- ['Male–female jumper, ~20 cm','0','3','Layout B only: W1, W2, W5 (socket end onto the ESP32 pin).'],
- ['Female–female jumper','0','0','Not needed.'],
- ['830-hole breadboard','1','1','Check whether the power rails are split in the middle.'],
- ['DC jack adapter, 5.5 × 2.1 mm, screw terminals','1','1','Female barrel socket to two screw terminals.'],
- ['5 V DC adapter, ≥ 1 A (2 A better), 5.5 × 2.1 mm plug','1','1','Servo power only. Alternative: ELEGOO breadboard power module set to 5 V (fine for one SG90 with a light chute; feed it from a 9 V 1 A adapter, not a 9 V battery).'],
- ['Electrolytic capacitor 470–1000 µF, ≥ 10 V','1','1','Across the servo rails, stripe to −.'],
- ['6 × 6 mm tactile button (4 legs)','1','1','Or any momentary button with 2 wires.'],
- ['SG90 / MG90 servo with horns and screws','1','1','From the ELEGOO kit.'],
- ['ESP32 dev board','1','1','30-pin DEVKIT V1 drawn; check labels on yours.']
+const BOMG=[
+ {t:'You already have these: use them',col:'var(--good)',rows:[
+  ['ESP32 dev board','1 of your 2','Controls only the servo.'],
+  ['Breadboard, 830 holes','1','ELEGOO kit.'],
+  ['Male–male jumpers','6','W1–W6 in Layout A. Layout B: 3 male–male + 3 male–female.'],
+  ['SG90 servo with horns and screws','1','ELEGOO kit.'],
+  ['Tactile pushbutton','1','ELEGOO kit: the physical confirmation button.'],
+  ['ELEGOO Power MB V2 + 9 V battery clip with barrel plug','1','Servo power instead of a 5 V adapter. A 6.5–9 V DC adapter (5.5 × 2.1 mm, centre +) can replace the battery.'],
+  ['Logitech webcams','2','Webcam A at the caliper display, Webcam B at the vision station.'],
+  ['Laptop and 3D printer','1 each','']]},
+ {t:'Get or borrow',col:'var(--warn)',rows:[
+  ['Digital caliper','1','Required: the measurement station depends on it.'],
+  ['White or light PLA','< 100 g','For the 9 specimens (my estimate).'],
+  ['Fresh 9 V battery','1','If the kit battery is old or used.'],
+  ['Multimeter','1','Borrow one: polarity, voltage and short checks before power-up (bench test W and P).'],
+  ['Cables you said you can find','—','ESP32 USB data cable; adapters or a hub for 3 devices (2 webcams + ESP32).']]},
+ {t:'Make from household material',col:'var(--accent)',rows:[
+  ['Baseboard ≈ 800 × 250 mm','1','Plywood, MDF, foam board, or stiff cardboard.'],
+  ['Two straight rails','2','Wood strips or folded cardboard, 10–20 mm high.'],
+  ['Blocks ≈ 100 mm high','4','Books or wood offcuts under the baseboard.'],
+  ['Bins, 50 mm high or less','3','Small boxes or lids: PASS, HOLD, REJECT.'],
+  ['Swivel chute','1','Folded card U-channel ≈ 110 × 50 mm with a card wedge, glued to the servo horn.'],
+  ['Dark matte sheet','1','Black paper or felt under Webcam B.'],
+  ['Desk lamp','1–2','Fixed position at the vision station.'],
+  ['Tape, hot glue, zip ties','—','Rails, camera mounts, servo plug.']]},
+ {t:'Skipped (optional)',col:'var(--muted)',rows:[
+  ['Capacitor 470–1000 µF','—','Use one if the kit has 100 µF or more; the build works without it.'],
+  ['USB charger power lead','—','Only if you have no battery or adapter for the Power MB V2.'],
+  ['Powered USB hub','—','Only if a webcam drops out (bench test C1).'],
+  ['Dedicated lights and camera stands','—','Improvise with lamps, clamps, books, and tape.'],
+  ['Arrival sensor (LDR + 4N35)','—','Optional later phase; its action_id correlation is not implemented yet.']]},
+ {t:'Not used in this demo (leave in the box)',col:'var(--bad)',rows:[
+  ['Second ESP32','—','Reserved for the optional arrival sensor later.'],
+  ['Camera module','—','The two Logitech webcams cover both stations.'],
+  ['Raspberry Pi 5 + Hailo AI HAT+','—','No Pi capture code or Hailo model exists in the current code, and Hailo inference must not be claimed without real weights and run evidence.'],
+  ['Arduino','—','The ESP32 runs the servo firmware.'],
+  ['Bluetooth serial module','—','Route commands stay on the USB cable; no wireless actuator path.'],
+  ['QAPASS LCD screen','—','The laptop shows the route. A display on the device would be a later firmware change.'],
+  ['Gas, raindrop, flame, sound, and touch sensors; reed switch','—','Not related to dimensional or visual inspection.'],
+  ['Potentiometer','—','Belongs to the old placeholder ADC path, not the manual caliper.'],
+  ['DC motor, motor driver, belt','—','No powered conveyor in this scope.']]}
 ];
-const BOM2=[
- ['USB data cable for the ESP32 (micro-USB or USB-C)','1','ESP32 → hub'],
- ['Logitech webcams','2','USB → hub'],
- ['Powered USB hub, 3+ data ports','1','hub → laptop'],
- ['USB-C/USB-A adapter for the laptop (if needed)','1','hub → laptop'],
- ['Clamp or gooseneck stand','1','Webcam A'],
- ['Pole + horizontal arm (wood strip, camera arm, or desk lamp arm)','1','Webcam B overhead'],
- ['Diffuse lights','2','vision station'],
- ['Blocks ≈ 100 mm high','4','under baseboard'],
- ['Small trays/bins ≤ 50 mm high','3','PASS / HOLD / REJECT'],
- ['Cardboard or printed U-channel ≈ 110 × 50 mm, 10 mm walls, plus a wedge','1','swivel chute on the servo horn'],
- ['Multimeter','1','wiring and power checks'],
- ['Tape, hot glue, zip ties','—','fix plug, rails, stands']
-];
-for(const r of BOM){const tr=document.createElement('tr');tr.innerHTML=r.map((c,i)=>`<td>${i===0?'<b>'+esc(c)+'</b>':esc(c)}</td>`).join('');$('#bomTable tbody').appendChild(tr);}
-for(const r of BOM2){const tr=document.createElement('tr');tr.innerHTML=r.map(c=>`<td>${esc(c)}</td>`).join('');$('#bom2 tbody').appendChild(tr);}
+$('#bomGroups').innerHTML=BOMG.map(g=>`<div class="panel" style="margin-top:12px;border-left:4px solid ${g.col}"><h2>${esc(g.t)}</h2><table><thead><tr><th>item</th><th>qty</th><th>notes</th></tr></thead><tbody>${g.rows.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</tbody></table></div>`).join('');
 </script>
 </body>
 </html>
