@@ -10,7 +10,7 @@ Open the interactive version before you build: [`web/manual_track_visualizer.htm
 
 The visualizer is a training aid. It produces no evidence, and its decision thresholds are placeholders.
 
-Recording a compact video instead of building the full track? Open [`web/tabletop_demo.html`](../../web/tabletop_demo.html): everything in one spot, you measure by hand, show the part to one camera, press the button for the servo-flap beat, then place the part in its tray by hand, one part at a time. It is a staged manual walkthrough, not an automated system.
+Recording a compact video instead of building the full track? Open [`web/tabletop_demo.html`](../../web/tabletop_demo.html): everything in one spot, no servo, you measure by hand, show the part to one camera, read the decision, then place the part in its tray by hand, one part at a time. It is a staged manual walkthrough, not an automated system.
 
 For the physical build itself, open [`web/physical_build_guide.html`](../../web/physical_build_guide.html). It shows the breadboard hole by hole with each jumper's type, a 3D-style view of the whole bench with every cable (manual track, gravity chute, or motorized belt for comparison), a side view of the exit and swivel chute, a recordable bench test (41 tests, CSV export), a parts list (what to use, get, and leave in the box), and what to 3D print. The breadboard tab can switch between the two servo power options in section 3.
 

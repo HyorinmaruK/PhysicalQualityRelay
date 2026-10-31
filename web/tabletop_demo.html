@@ -63,7 +63,7 @@ details[open] summary{margin-bottom:8px}
 </header>
 <main>
   <div class="panel">
-    <p style="margin:0 0 6px">No long track. Everything sits in one spot. You measure by hand, show the part to one camera, read the decision, <b>press the button so the servo flap flicks</b> (one real automated beat), then guide the part into its tray by hand. Record one part at a time.</p>
+    <p style="margin:0 0 6px">No long track and no servo. Everything sits in one spot. You measure by hand, show the part to one camera, read the decision, then <b>place the part in its tray by hand</b>. Record one part at a time.</p>
     <div class="actions">
       <span class="tiny">Scenario:</span>
       <span class="seg" id="scn">
@@ -72,7 +72,7 @@ details[open] summary{margin-bottom:8px}
         <button data-s="C">Anomaly → REJECT if confirmed</button>
         <button data-s="D">Defect pair → REJECT</button>
       </span>
-      <label class="tiny"><input type="checkbox" id="prop" checked/> servo bench unit on the mat</label>
+
     </div>
   </div>
 
@@ -112,17 +112,6 @@ details[open] summary{margin-bottom:8px}
           <text x="375" y="392" text-anchor="middle" fill="#9aadc5" font-size="9">3 · DECISION (laptop)</text>
         </g>
 
-        <!-- Optional servo prop -->
-        <g class="comp" data-info="prop" id="propG">
-          <rect x="520" y="330" width="120" height="92" rx="5" fill="#141d2a" stroke="#344154"/>
-          <rect x="534" y="350" width="46" height="26" rx="3" fill="#18324a" stroke="#77c7d7"/>
-          <text x="557" y="367" text-anchor="middle" fill="#e9f0fb" font-size="9">ESP32</text>
-          <circle cx="610" cy="360" r="9" fill="#c42232" stroke="#5a1d22" stroke-width="2"/>
-          <g id="flapG"><rect x="596" y="392" width="40" height="5" rx="2" fill="#f0f0f0" stroke="#aaa"/></g>
-          <circle cx="600" cy="394" r="4" fill="#2d6cdf"/>
-          <text x="580" y="416" text-anchor="middle" class="lbls">optional: button + servo flap</text>
-        </g>
-
         <!-- trays -->
         <g class="comp" data-info="trays">
           <rect x="700" y="20" width="150" height="130" rx="8" class="tray" stroke="#5ccc91" fill="#5ccc91"/>
@@ -152,24 +141,20 @@ details[open] summary{margin-bottom:8px}
   </div>
 
   <details>
-    <summary>Simplified electronics</summary>
+    <summary>Electronics (not needed for this video)</summary>
     <div class="cols2" style="margin-top:4px">
       <div class="panel" style="border-color:#2c5a43">
-        <h2>Keep the servo: the automated beat</h2>
-        <p class="muted" style="margin-top:0">Keep the ESP32 + button + servo as a small bench unit beside the mat (no track). Glue a small card or printed flap on the horn. Stage P/H/R, press the button, the flap flicks: one genuine moment of automation on film. Reuse the exact wiring from the full guide, just physically compact.</p>
-        <table><thead><tr><th>wire</th><th>from</th><th>to</th></tr></thead><tbody>
-          <tr><td>W1 black</td><td>ESP32 GND</td><td>breadboard − rail</td></tr>
-          <tr><td>W3 red</td><td>servo red</td><td>+ rail (Power MB V2, 5V)</td></tr>
-          <tr><td>W4 brown</td><td>servo brown/black</td><td>− rail</td></tr>
-          <tr><td>W2 orange</td><td>servo signal</td><td>ESP32 GPIO13</td></tr>
-          <tr><td>W5 / W6</td><td>button</td><td>GPIO32 and GND</td></tr>
-        </tbody></table>
-        <p class="tiny">Full hole-by-hole version and the Power MB V2 setup: <a href="physical_build_guide.html">physical_build_guide.html</a>, tab 1. Firmware: <code>firmware/manual_sorter/esp32_manual_sorter.ino</code>. The button still moves the flap only after you stage P/H/R; it is a prop here, not wired to a track.</p>
+        <h2>Nothing to wire</h2>
+        <p class="muted" style="margin-top:0">For this video you do not build the breadboard at all. The "sorting" is you placing the part in the right tray. You still film the whole story: measure, show, decide, route.</p>
+        <ul>
+          <li>One camera and the digital caliper.</li>
+          <li>Three trays labeled PASS / HOLD / REJECT.</li>
+        </ul>
+        <div class="ok">Keep it honest on camera: you move the part by hand; there is no automated gate in this version.</div>
       </div>
       <div class="panel">
-        <h2>Fallback: no electronics</h2>
-        <p class="muted" style="margin-top:0">If a servo is not ready in time, drop the bench unit (uncheck "servo bench unit" above). You still film the whole story: measure, show, decide, and place the part in the matching tray by hand.</p>
-        <div class="ok">Either way, keep it honest on camera: the final placement into the tray is by hand. The servo flap is the automation beat; it is not attached to a conveyor.</div>
+        <h2>Later, if you get a servo</h2>
+        <p class="muted" style="margin-top:0">A servo diverter is an optional upgrade, not needed for the video. If you add one later, the full hole-by-hole wiring and the Power MB V2 setup are in <a href="physical_build_guide.html">physical_build_guide.html</a>, and the firmware is <code>firmware/manual_sorter/esp32_manual_sorter.ino</code>.</p>
       </div>
     </div>
   </details>
@@ -184,8 +169,8 @@ details[open] summary{margin-bottom:8px}
         <tr><td><b>Laptop</b></td><td>required</td><td>Shows the decision. The run log is <code>docs/engineering/templates/manual_track_run_log.csv</code>.</td></tr>
         <tr><td><b>3 trays + labels</b></td><td>required</td><td>Small boxes or lids: PASS, HOLD, REJECT.</td></tr>
         <tr><td><b>Dark mat + lamp</b></td><td>recommended</td><td>Dark paper under the SHOW square; one steady lamp.</td></tr>
-        <tr><td><b>ESP32 + breadboard + button + SG90 + Power MB V2</b></td><td>recommended</td><td>The servo bench unit gives one real automated beat. A small card flap on the horn is enough.</td></tr>
-        <tr><td><b>Printed swivel chute / tower</b></td><td>not needed</td><td>Those are for the real track. For the tabletop, a card flap on the servo horn is enough.</td></tr>
+        <tr><td><b>ESP32 / servo / breadboard</b></td><td>not needed</td><td>No servo in this version. Optional later upgrade; see the full build guide.</td></tr>
+        <tr><td><b>Printed swivel chute / tower</b></td><td>not needed</td><td>Those are for the real servo track, not the tabletop video.</td></tr>
       </tbody></table>
     </div>
   </details>
@@ -216,8 +201,7 @@ const INFO={
   measure:['1 · Measure by hand','Put the specimen on this square. Measure the critical width three times with the digital caliper. You read and type the numbers; nothing is motorized.'],
   camera:['2 · Show to one camera','One fixed camera films this square. First hold the caliper display here, then lay the part here. The same camera is your record of both the number and the part.'],
   laptop:['3 · Decision','You apply the rules (or the dashboard shows them). Missing or inconsistent evidence is HOLD. REJECT only after you confirm a real nonconformance.'],
-  trays:['4 · Route by hand','Three trays. After the decision you place the part in the matching tray yourself. On camera, say this is a manual move, not an automated sort.'],
-  prop:['Optional servo prop','A small ESP32 + button + servo beside the mat. Press the button and the flap flicks: one real automated beat for the film. It is not attached to any track.']
+  trays:['4 · Route by hand','Three trays. After the decision you place the part in the matching tray yourself. On camera, say this is a manual move, not an automated sort.']
 };
 document.querySelectorAll('#mat .comp').forEach(g=>g.addEventListener('click',e=>{const k=g.dataset.info;if(INFO[k]){$('#info').innerHTML='<b>'+esc(INFO[k][0])+'</b> — '+esc(INFO[k][1]);}e.stopPropagation();}));
 
@@ -258,8 +242,7 @@ const STEPS=[
   {t:'Show the caliper to the camera',cam:'The caliper display filling the SHOW square.',say:'The confirmed width is {mean} mm.',do:'Hold the display in the SHOW square for one still.'},
   {t:'Show the part to the camera',cam:'The part in the SHOW square.',say:'Visual check: {vision}.',do:'Lay the part in the SHOW square. Do not touch its surface.'},
   {t:'Read the decision',cam:'The laptop screen.',say:'The decision is {state}.',do:'Apply the rules (or let the dashboard show them).',decision:true},
-  {t:'Stage the route, press the button',cam:'The staged letter on screen, then the servo flap flicking to {state}.',say:'I stage {letter} and press the button; the gate moves.',do:'Type {letter} in the serial monitor, then press the physical button. No servo on the table? Skip this step.',servo:true},
-  {t:'Guide the part into its tray',cam:'The part going into the {state} tray.',say:'It goes to {state}.',do:'Guide the part off the flap into the matching tray. On camera, say the final placement is by hand.',route:true},
+  {t:'Place the part in its tray by hand',cam:'Your hand moving the part into the {state} tray.',say:'It goes to {state}; I place it by hand.',do:'Move the part into the matching tray. On camera, say the placement is by hand.',route:true},
   {t:'Reset for the next part',cam:'The empty mat.',say:'Next part.',do:'Clear the SHOW square and pick the next scenario.',reset:true}
 ];
 
@@ -309,10 +292,6 @@ async function next(){
   if(S.i===1){for(const v of sc.readings){$('#cal').textContent=v.toFixed(2);await tween(250,()=>{});}}
   if(S.i===2){await tween(400,k=>tokenAt(POS.measure[0]+(POS.show[0]-POS.measure[0])*k,POS.measure[1]+(POS.show[1]-POS.measure[1])*k));}
   if(st.decision){if(!S.dec){S.dec=decide(sc);setScreen();}}
-  if(st.servo&&S.dec&&$('#prop').checked){
-    const ang={PASS:-45,HOLD:0,REJECT:45}[S.dec.state];
-    await tween(600,k=>$('#flapG').setAttribute('transform',`rotate(${ang*k} 600 394)`));
-  }
   if(st.route&&S.dec){
     const [tx,ty]=[775,TRAY_Y[S.dec.state]];
     const ha=$('#handArrow');ha.innerHTML='';el('path',{d:`M${POS.show[0]},${POS.show[1]} C${POS.show[0]+120},${POS.show[1]} ${tx-140},${ty} ${tx},${ty}`,class:'hand','marker-end':'url(#ah)'},ha);
@@ -333,7 +312,6 @@ function newRun(key){
 }
 
 document.querySelectorAll('#scn button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#scn button').forEach(x=>x.classList.toggle('on',x===b));newRun(b.dataset.s);});
-$('#prop').onchange=e=>{$('#propG').style.display=e.target.checked?'':'none';};
 newRun('A');
 </script>
 </body>
