@@ -14,6 +14,7 @@ Start here:
 - [Virtual line, wiring, and firmware emulator](web/manual_track_visualizer.html) (open the file in a browser; simulation only)
 - [Physical build: breadboard holes and jumper types, bench layout, bench test, 3D-print list](web/physical_build_guide.html) (open the file in a browser)
 - [Tabletop demo: one-spot manual walkthrough and video storyboard](web/tabletop_demo.html) (open the file in a browser)
+- [Measurement logger: caliper readings → CSV, with optional ESP32 capture](web/measurement_logger.html) (open the file in a browser) · [schema and handoff](docs/engineering/MEASUREMENT_LOGGING.md)
 - [Kiro Web handoff](KIRO_START_PROMPT.md)
 - [Physical demo requirements](.kiro/specs/manual-track-demo/requirements.md)
 - [ESP32 manual-sorter firmware](firmware/manual_sorter/esp32_manual_sorter.ino)
