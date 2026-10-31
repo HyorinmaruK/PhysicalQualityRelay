@@ -42,6 +42,7 @@
 
 #define USE_LCD         0            // 1 to drive a QAPASS 16x2 I2C LCD (needs LiquidCrystal_I2C)
 #define SEND_FULL_ROW   0            // 1 to print "QRM,feature,location,value" instead of a bare number
+#define USE_RGB         1            // onboard addressable RGB LED feedback (off at boot, green per reading)
 
 #include <math.h>
 #if USE_LCD
@@ -55,6 +56,7 @@ const int POT_PIN           = 4;    // ESP32-S3 ADC1_CH3. Classic ESP32: use 34.
 const int BUTTON_PIN        = 5;    // "send reading" button to GND, INPUT_PULLUP. Classic ESP32: 32.
 const int CALIPER_CLK_PIN   = 6;    // SOURCE_CALIPER only, via level shifter
 const int CALIPER_DATA_PIN  = 7;    // SOURCE_CALIPER only, via level shifter
+const int RGB_PIN           = 48;   // Freenove ESP32-S3-WROOM onboard WS2812; change if your board differs
 
 // ----- potentiometer calibration (SOURCE_POT) -----
 // Fit these to YOUR gauge: record >= 5 known caliper positions and the raw ADC at each,
@@ -71,6 +73,12 @@ const char* LOCATION = "mid";
 const unsigned long DEBOUNCE_MS = 250;
 unsigned long lastPressMs = 0;
 bool lastPressed = false;
+
+void rgb(uint8_t r, uint8_t g, uint8_t b) {
+#if USE_RGB
+  neopixelWrite(RGB_PIN, r, g, b);   // built into the ESP32 Arduino core; no library needed
+#endif
+}
 
 float mapRawToMm(int raw) {
   if (raw < ADC_MIN) raw = ADC_MIN;
@@ -122,6 +130,7 @@ void emitReading(float mm) {
   lcd.clear(); lcd.setCursor(0, 0); lcd.print("meas: "); lcd.print(mm, 2);
   lcd.setCursor(0, 1); lcd.print("LOGGED");
 #endif
+  rgb(0, 30, 0); delay(60); rgb(0, 0, 0);   // brief green blink = reading sent
 }
 
 void setup() {
@@ -138,6 +147,8 @@ void setup() {
   lcd.init(); lcd.backlight();
   lcd.print("QualityRelay"); lcd.setCursor(0, 1); lcd.print("measure ready");
 #endif
+  rgb(0, 0, 0);                              // turn off the bright default colour
+  rgb(0, 0, 20); delay(200); rgb(0, 0, 0);   // one short blue blink = firmware started
   Serial.println("# QRM ready");
   Serial.println("# press the button to send one reading");
 }
