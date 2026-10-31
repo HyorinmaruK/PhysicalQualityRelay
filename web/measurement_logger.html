@@ -144,18 +144,25 @@ code{background:#0c121b;padding:1px 5px;border-radius:5px}
       <table><thead><tr><th>from</th><th>to</th><th>why</th></tr></thead><tbody>
         <tr><td>pot outer pin 1</td><td>ESP32 3V3</td><td>top of the divider</td></tr>
         <tr><td>pot outer pin 2</td><td>ESP32 GND</td><td>bottom of the divider</td></tr>
-        <tr><td>pot wiper (middle)</td><td>ESP32 GPIO34 (ADC, input-only)</td><td>the position voltage</td></tr>
-        <tr><td>button leg 1</td><td>ESP32 GPIO32</td><td>"send reading" button (INPUT_PULLUP)</td></tr>
-        <tr><td>button leg 2</td><td>ESP32 GND</td><td>pressed = LOW</td></tr>
-        <tr><td>QAPASS LCD VCC / GND</td><td>ESP32 5V (VIN) / GND</td><td>power the 16×2 display (optional)</td></tr>
-        <tr><td>QAPASS LCD SDA / SCL</td><td>ESP32 GPIO21 / GPIO22</td><td>I²C data / clock (optional)</td></tr>
+        <tr><td>pot wiper (middle)</td><td>ESP32-S3 GPIO4 (ADC1)</td><td>the position voltage</td></tr>
+        <tr><td>button leg 1</td><td>ESP32-S3 GPIO5</td><td>"send reading" button (INPUT_PULLUP)</td></tr>
+        <tr><td>button leg 2</td><td>ESP32 GND (− rail)</td><td>pressed = LOW</td></tr>
+        <tr><td>QAPASS LCD VCC / GND</td><td>+ rail (3V3; use 5V if dim) / − rail</td><td>power the 16×2 display (optional)</td></tr>
+        <tr><td>QAPASS LCD SDA / SCL</td><td>ESP32-S3 GPIO8 / GPIO9</td><td>I²C data / clock (optional)</td></tr>
       </tbody></table>
       <div class="note"><b>Calibrate first.</b> Measure at least five known positions against the real caliper, then set <code>ADC_MIN/ADC_MAX</code> and <code>MM_MIN/MM_MAX</code> in the sketch. Without that the millimetres are meaningless.</div>
-      <p class="tiny">Firmware: <code>firmware/measurement_station/esp32_measurement_station.ino</code> (default mode). GPIO34 is input-only and ADC-safe.</p>
+      <p class="tiny">Firmware: <code>firmware/measurement_station/esp32_measurement_station.ino</code> (default mode). S3 pins GPIO4 (pot/ADC1), GPIO5 (button), GPIO8/GPIO9 (I²C). For a classic ESP32 use 34/32/21/22.</p>
+      <div class="note"><b>Mounting a wide ESP32-S3 (Freenove / N16R8).</b> These boards cover the whole half of the breadboard, so there is no free row next to the pins. Three ways to handle it:
+        <ol style="margin:4px 0 0;padding-left:18px">
+          <li><b>Recommended, no solder:</b> leave the board <i>off</i> the breadboard (as drawn) and use <b>female–male</b> jumpers — female end onto the ESP32 header pin, male end into the breadboard. The breadboard holds only the pot, button, LCD and the rails.</li>
+          <li><b>Two breadboards:</b> push two breadboards together long-edge to long-edge; the board straddles the seam and each pin row gets free holes on its outer side. Then wire like a normal board.</li>
+          <li><b>Solder:</b> solder the board onto a piece of protoboard, or solder a short pigtail harness to the pins you use (GPIO4, GPIO5, GPIO8, GPIO9, 3V3, GND). Only if you want it permanent — the jumper method needs no cutting or soldering.</li>
+        </ol>
+      </div>
       <h3>Wire it and test (USB unplugged while wiring)</h3>
       <ol class="tiny" style="margin:0;padding-left:18px">
         <li>Wire the three pot pins, then the button. The LCD is optional — skip it for the first test.</li>
-        <li>Multimeter across the pot: wiper (GPIO34 wire) should read 0 → 3.3 V as you slide it. If it does not, swap pin1/pin2.</li>
+        <li>Multimeter across the pot: the wiper (GPIO4 wire) should read 0 → 3.3 V as you slide it. If it does not, swap pin1/pin2.</li>
         <li>Plug in USB. Flash <code>esp32_measurement_station.ino</code> with <code>READ_SOURCE = SOURCE_POT</code>. Open Serial Monitor at 115200; you should see <code># QRM ready</code>.</li>
         <li>Press the button. A number prints each press. Slide the gauge, press again: the number changes.</li>
         <li>Calibrate: at ≥ 5 known caliper positions, note the printed raw/number, then set <code>ADC_MIN/ADC_MAX</code> and <code>MM_MIN/MM_MAX</code> in the sketch and reflash.</li>
@@ -437,70 +444,77 @@ $('#devConnect').onclick=async()=>{
 };
 $('#devDisconnect').onclick=async()=>{keepReading=false;try{if(reader){await reader.cancel();reader=null;}if(port){await port.close();port=null;}}catch(e){}setDevConnected(false);};
 
-// ---- breadboard layout for the measurement station (static render) ----
+// ---- breadboard layout: wide ESP32-S3 beside the breadboard, female-to-male jumpers ----
 (function(){
   const svg=document.getElementById('bbMeas'); if(!svg) return;
+  svg.setAttribute('viewBox','0 0 600 384');
   const NS='http://www.w3.org/2000/svg';
   const E=(t,a,txt)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;svg.appendChild(e);return e;};
-  const P=12,x0=60,cx=c=>x0+(c-1)*P,NC=34;
-  const RY={plus:24,minus:38,a:66,b:78,c:90,d:102,e:114,f:150,g:162,h:174,i:186,j:198};
+  const P=13,x0=70,cx=c=>x0+(c-1)*P,NC=26;
+  const RY={tp:162,tn:174,a:196,b:208,c:220,d:232,e:244,f:268,g:280,h:292,i:304,j:316,bp:336,bn:348};
   const right=cx(NC)+14;
-  E('rect',{x:40,y:12,width:right-40,height:200,rx:6,fill:'#ece8de',stroke:'#b9b3a3'});
-  E('rect',{x:40,y:128,width:right-40,height:10,fill:'#d6d0c2'});
-  E('line',{x1:50,x2:right-6,y1:24,y2:24,stroke:'#ff7b7b','stroke-width':1.3});
-  E('line',{x1:50,x2:right-6,y1:38,y2:38,stroke:'#6ea8ff','stroke-width':1.3});
-  E('text',{x:44,y:27,'font-size':11,fill:'#ff7b7b','font-weight':700},'+');
-  E('text',{x:44,y:42,'font-size':11,fill:'#6ea8ff','font-weight':700},'\u2212');
-  E('text',{x:right+2,y:27,'font-size':9,fill:'#9aadc5'},'3V3');
-  E('text',{x:right+2,y:42,'font-size':9,fill:'#9aadc5'},'GND');
-  const rows=['plus','minus','a','b','c','d','e','f','g','h','i','j'];
+  // ---- ESP32-S3 board (off the breadboard) ----
+  E('rect',{x:50,y:12,width:330,height:58,rx:5,fill:'#1f2a44',stroke:'#0d1220'});
+  E('text',{x:215,y:34,'font-size':11,fill:'#e9f0fb','text-anchor':'middle'},'ESP32-S3 (Freenove / N16R8) — sits beside the breadboard');
+  E('text',{x:215,y:50,'font-size':9,fill:'#9aadc5','text-anchor':'middle'},'too wide to leave a free row, so use female\u2013male jumpers onto its header pins');
+  const esp=[['3V3',90,'#ff7b7b'],['GND',135,'#9aadc5'],['GPIO4',180,'#ff9d2e'],['GPIO5',225,'#5ccc91'],['GPIO8',270,'#6ea8ff'],['GPIO9',315,'#efd271'],['5V',360,'#ffd79c']];
+  esp.forEach(p=>{E('circle',{cx:p[1],cy:70,r:3.2,fill:p[2]});E('rect',{x:p[1]-4,y:76,width:8,height:8,rx:1,fill:'none',stroke:p[2],'stroke-width':1.6});E('text',{x:p[1],y:64,'font-size':8,fill:'#e9f0fb','text-anchor':'middle'},p[0]);});
+  E('text',{x:360,y:98,'font-size':7,fill:'#9aadc5','text-anchor':'middle'},'spare');
+  // ---- breadboard ----
+  E('rect',{x:56,y:150,width:right-56,height:212,rx:6,fill:'#ece8de',stroke:'#b9b3a3'});
+  E('rect',{x:56,y:250,width:right-56,height:12,fill:'#d6d0c2'});
+  E('line',{x1:64,x2:right-6,y1:162,y2:162,stroke:'#ff7b7b','stroke-width':1.3});
+  E('line',{x1:64,x2:right-6,y1:174,y2:174,stroke:'#6ea8ff','stroke-width':1.3});
+  E('line',{x1:64,x2:right-6,y1:336,y2:336,stroke:'#ff7b7b','stroke-width':1.3});
+  E('line',{x1:64,x2:right-6,y1:348,y2:348,stroke:'#6ea8ff','stroke-width':1.3});
+  E('text',{x:58,y:165,'font-size':10,fill:'#ff7b7b','font-weight':700},'+');E('text',{x:58,y:178,'font-size':10,fill:'#6ea8ff','font-weight':700},'\u2212');
+  E('text',{x:58,y:339,'font-size':10,fill:'#ff7b7b','font-weight':700},'+');E('text',{x:58,y:351,'font-size':10,fill:'#6ea8ff','font-weight':700},'\u2212');
+  E('text',{x:right+2,y:165,'font-size':8,fill:'#9aadc5'},'3V3');E('text',{x:right+2,y:178,'font-size':8,fill:'#9aadc5'},'GND');
+  const rows=['tp','tn','a','b','c','d','e','f','g','h','i','j','bp','bn'];
   for(const r of rows){for(let c=1;c<=NC;c++){E('rect',{x:cx(c)-2,y:RY[r]-2,width:4,height:4,fill:'#2b2b2b'});}}
-  for(let c=1;c<=NC;c+=5){E('text',{x:cx(c),y:RY.j+16,'font-size':8,fill:'#888','text-anchor':'middle'},''+c);}
-  for(const r of ['a','b','c','d','e','f','g','h','i','j']){E('text',{x:46,y:RY[r]+3,'font-size':8,fill:'#888'},r);}
-  // ESP32 body (pins sit in rows b and i; we jumper from the free rows a and j)
-  E('rect',{x:cx(3)-5,y:RY.c-6,width:cx(17)-cx(3)+10,height:RY.h-RY.c+12,rx:3,fill:'#1f2a44',stroke:'#0d1220'});
-  E('text',{x:(cx(3)+cx(17))/2,y:(RY.c+RY.h)/2+3,'font-size':11,fill:'#e9f0fb','text-anchor':'middle'},'ESP32 DevKit');
-  E('rect',{x:46,y:RY.e+2,width:16,height:12,rx:2,fill:'#9aa3ad'});
-  E('text',{x:40,y:RY.e+24,'font-size':8,fill:'#888'},'USB');
-  const pin=(r,c,color,label)=>{E('circle',{cx:cx(c),cy:RY[r],r:3.4,fill:color});E('text',{x:cx(c),y:r==='a'?RY.a-6:RY.j+14,'font-size':8,fill:'#e9f0fb','text-anchor':'middle'},label);};
-  pin('a',3,'#ff7b7b','5V');pin('a',4,'#9aadc5','GND');pin('a',12,'#5ccc91','G32');pin('a',14,'#ff9d2e','G34');
-  pin('j',3,'#ff7b7b','3V3');pin('j',4,'#9aadc5','GND');pin('j',13,'#6ea8ff','G21');pin('j',16,'#efd271','G22');
-  // potentiometer: legs in columns 22/23/24, body bracket above
-  E('rect',{x:cx(22)-6,y:RY.c-18,width:cx(24)-cx(22)+12,height:12,rx:3,fill:'#20303f',stroke:'#9aadc5'});
-  E('text',{x:cx(23),y:RY.c-21,'font-size':9,fill:'#9aadc5','text-anchor':'middle'},'pot');
-  [22,23,24].forEach(c=>{E('line',{x1:cx(c),y1:RY.c-6,x2:cx(c),y2:RY.c,stroke:'#888','stroke-width':1.4});E('circle',{cx:cx(c),cy:RY.c,r:3,fill:'#bbb'});});
-  E('text',{x:cx(22),y:RY.d+10,'font-size':7,fill:'#888','text-anchor':'middle'},'1');
-  E('text',{x:cx(23),y:RY.d+10,'font-size':7,fill:'#888','text-anchor':'middle'},'W');
-  E('text',{x:cx(24),y:RY.d+10,'font-size':7,fill:'#888','text-anchor':'middle'},'2');
-  // button straddles the gap at columns 28 & 30
-  E('rect',{x:cx(28)-5,y:RY.e+3,width:cx(30)-cx(28)+10,height:RY.f-RY.e-6,rx:3,fill:'#333',stroke:'#888'});
-  E('circle',{cx:(cx(28)+cx(30))/2,cy:(RY.e+RY.f)/2,r:7,fill:'#c42232'});
-  [['e',28],['e',30],['f',28],['f',30]].forEach(a=>E('circle',{cx:cx(a[1]),cy:RY[a[0]],r:3,fill:'#bbb'}));
-  E('text',{x:(cx(28)+cx(30))/2,y:RY.e-4,'font-size':8,fill:'#9aadc5','text-anchor':'middle'},'button');
+  for(const r of ['a','b','c','d','e','f','g','h','i','j']){E('text',{x:60,y:RY[r]+3,'font-size':7,fill:'#888'},r);}
+  for(let c=1;c<=NC;c+=5){E('text',{x:cx(c),y:RY.bn+12,'font-size':7,fill:'#888','text-anchor':'middle'},''+c);}
+  // potentiometer in columns 8/9/10 (wiper = 9), legs in row c
+  E('rect',{x:cx(8)-6,y:RY.c-18,width:cx(10)-cx(8)+12,height:12,rx:3,fill:'#20303f',stroke:'#9aadc5'});
+  E('text',{x:cx(9),y:RY.c-21,'font-size':9,fill:'#9aadc5','text-anchor':'middle'},'pot');
+  [8,9,10].forEach(c=>{E('line',{x1:cx(c),y1:RY.c-6,x2:cx(c),y2:RY.c,stroke:'#888','stroke-width':1.4});E('circle',{cx:cx(c),cy:RY.c,r:3,fill:'#bbb'});});
+  E('text',{x:cx(8),y:RY.d+9,'font-size':7,fill:'#888','text-anchor':'middle'},'1');E('text',{x:cx(9),y:RY.d+9,'font-size':7,fill:'#888','text-anchor':'middle'},'W');E('text',{x:cx(10),y:RY.d+9,'font-size':7,fill:'#888','text-anchor':'middle'},'2');
+  // button straddling the gap at columns 14 & 16
+  E('rect',{x:cx(14)-5,y:RY.e+3,width:cx(16)-cx(14)+10,height:RY.f-RY.e-6,rx:3,fill:'#333',stroke:'#888'});
+  E('circle',{cx:(cx(14)+cx(16))/2,cy:(RY.e+RY.f)/2,r:7,fill:'#c42232'});
+  [['e',14],['e',16],['f',14],['f',16]].forEach(a=>E('circle',{cx:cx(a[1]),cy:RY[a[0]],r:3,fill:'#bbb'}));
+  E('text',{x:(cx(14)+cx(16))/2,y:RY.e-4,'font-size':8,fill:'#9aadc5','text-anchor':'middle'},'button');
   // LCD off-board (optional)
-  const lx=cx(NC)+40;
-  E('rect',{x:lx,y:58,width:120,height:72,rx:5,fill:'#141d2a',stroke:'#344154','stroke-dasharray':'4 3'});
-  E('text',{x:lx+60,y:52,'font-size':9,fill:'#9aadc5','text-anchor':'middle'},'QAPASS I\u00B2C LCD (optional)');
-  const lp=[['VCC','#ff7b7b'],['GND','#9aadc5'],['SDA','#6ea8ff'],['SCL','#efd271']];
-  lp.forEach((p,i)=>{const X=lx+22+i*26;E('circle',{cx:X,cy:130,r:3,fill:p[1]});E('text',{x:X,y:144,'font-size':7,fill:'#9aadc5','text-anchor':'middle'},p[0]);});
-  // jumpers
-  const J=(pts,color)=>E('path',{d:'M'+pts.map(p=>p[0]+','+p[1]).join(' L'),fill:'none',stroke:color,'stroke-width':2.4,'stroke-linecap':'round','stroke-linejoin':'round'});
-  J([[cx(3),RY.j],[cx(1.4),RY.j],[cx(1.4),24]],'#ff7b7b');      // 3V3 j3 -> + rail
-  J([[cx(4),RY.j],[cx(2.4),RY.j],[cx(2.4),38]],'#9aadc5');      // GND  j4 -> - rail
-  J([[cx(22),RY.a],[cx(22),24]],'#ff7b7b');                      // pot pin1 -> + rail
-  J([[cx(23),RY.a],[cx(23),RY.a-9],[cx(14),RY.a-9],[cx(14),RY.a]],'#ff9d2e'); // pot wiper -> G34 (a14)
-  J([[cx(24),RY.a],[cx(25.3),RY.a],[cx(25.3),38]],'#6ea8ff');    // pot pin2 -> - rail (blue hop)
-  J([[cx(28),RY.a],[cx(28),RY.a-13],[cx(12),RY.a-13],[cx(12),RY.a]],'#5ccc91'); // button -> G32 (a12)
-  J([[cx(28),RY.j],[cx(31),RY.j],[cx(31),38]],'#9aadc5');        // button -> - rail
-  J([[lx+22,130],[lx+22,24],[cx(32),24]],'#ff7b7b');             // LCD VCC -> + rail
-  J([[lx+48,130],[lx+48,38],[cx(33),38]],'#9aadc5');             // LCD GND -> - rail
-  J([[lx+74,130],[lx+74,RY.j+6],[cx(13),RY.j+6],[cx(13),RY.j]],'#6ea8ff'); // LCD SDA -> G21 j13
-  J([[lx+100,130],[lx+100,RY.j+10],[cx(16),RY.j+10],[cx(16),RY.j]],'#efd271'); // LCD SCL -> G22 j16
+  E('rect',{x:440,y:152,width:120,height:66,rx:5,fill:'#141d2a',stroke:'#344154','stroke-dasharray':'4 3'});
+  E('text',{x:500,y:146,'font-size':9,fill:'#9aadc5','text-anchor':'middle'},'QAPASS I\u00B2C LCD (optional)');
+  const lp=[['VCC',456,'#ff7b7b'],['GND',484,'#9aadc5'],['SDA',512,'#6ea8ff'],['SCL',540,'#efd271']];
+  lp.forEach(p=>{E('circle',{cx:p[1],cy:218,r:3,fill:p[2]});E('text',{x:p[1],y:232,'font-size':7,fill:'#9aadc5','text-anchor':'middle'},p[0]);});
+  // jumper drawing: FM = female (square) at ESP32 end, male (dot) at breadboard end
+  const J=(pts,color,w)=>E('path',{d:'M'+pts.map(p=>p[0]+','+p[1]).join(' L'),fill:'none',stroke:color,'stroke-width':w||2.3,'stroke-linecap':'round','stroke-linejoin':'round'});
+  const dot=(x,y,color)=>E('circle',{cx:x,cy:y,r:3,fill:color});
+  // female->male jumpers from ESP32 header to the breadboard
+  const fm=(px,color,tx,ty)=>{J([[px,84],[px,120],[tx,140],[tx,ty]],color);dot(tx,ty,color);};
+  fm(90,'#ff7b7b',cx(2),RY.tp);     // 3V3 -> + rail
+  fm(135,'#9aadc5',cx(3),RY.tn);    // GND -> - rail
+  fm(180,'#ff9d2e',cx(9),RY.a);     // GPIO4 -> pot wiper column
+  fm(225,'#5ccc91',cx(14),RY.a);    // GPIO5 -> button top column
+  fm(270,'#6ea8ff',cx(20),RY.a);    // GPIO8 -> SDA column
+  fm(315,'#efd271',cx(22),RY.a);    // GPIO9 -> SCL column
+  // breadboard male-male jumpers
+  J([[cx(8),RY.c],[cx(8),RY.tp]],'#ff7b7b');dot(cx(8),RY.tp,'#ff7b7b');       // pot pin1 -> + rail
+  J([[cx(10),RY.c],[cx(10),RY.tn]],'#6ea8ff');dot(cx(10),RY.tn,'#6ea8ff');    // pot pin2 -> - rail
+  J([[cx(14),RY.f],[cx(14),RY.bn]],'#9aadc5');dot(cx(14),RY.bn,'#9aadc5');     // button bottom -> bottom - rail
+  // rail ties top<->bottom
+  J([[cx(24),RY.tn],[cx(24),RY.bn]],'#6ea8ff',1.5);J([[cx(25),RY.tp],[cx(25),RY.bp]],'#ff7b7b',1.5);
+  E('text',{x:cx(24)-2,y:RY.g,'font-size':7,fill:'#9aadc5','text-anchor':'end'},'tie \u2212');
+  // LCD jumpers
+  J([[456,218],[456,RY.tp],[cx(23),RY.tp]],'#ff7b7b');dot(cx(23),RY.tp,'#ff7b7b');  // VCC -> + rail
+  J([[484,218],[484,RY.tn],[cx(26),RY.tn]],'#9aadc5');dot(cx(26),RY.tn,'#9aadc5');  // GND -> - rail
+  J([[512,218],[512,RY.b],[cx(20),RY.b]],'#6ea8ff');dot(cx(20),RY.b,'#6ea8ff');     // SDA -> col20
+  J([[540,218],[540,RY.c],[cx(22),RY.c]],'#efd271');dot(cx(22),RY.c,'#efd271');     // SCL -> col22
   // legend
-  E('text',{x:40,y:230,'font-size':9,fill:'#9aadc5'},'Top rails: + = 3V3, \u2212 = GND. Jumper the ESP32 3V3 (j3) to +, and a GND (j4) to \u2212, then everything taps the rails.');
-  E('text',{x:40,y:243,'font-size':9,fill:'#9aadc5'},'pot: pin1\u2192+ rail, wiper\u2192G34, pin2\u2192\u2212 rail. button: one side\u2192G32, other\u2192\u2212 rail. Colours match the wire nets.');
+  E('text',{x:56,y:376,'font-size':9,fill:'#9aadc5'},'\u25A1 = female end on the ESP32 pin, \u25CF = male end in a hole. Top & bottom \u2212 rails tied; + rails tied. Never put 5V on a GPIO.');
 })();
-
 </script>
 </body>
 </html>

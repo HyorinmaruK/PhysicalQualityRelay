@@ -30,6 +30,10 @@
   to 1 and edit FEATURE/LOCATION to emit full rows instead.
 
   Wiring is documented in web/measurement_logger.html, tab 2.
+
+  Pins are set for an ESP32-S3 (Freenove / N16R8): GPIO4 (pot/ADC1), GPIO5 (button),
+  GPIO8/GPIO9 (I2C LCD). On the N16R8, GPIO26-37 are taken by the octal flash/PSRAM and
+  GPIO0/3/45/46 are strapping pins, so avoid them. For a classic ESP32 use 34/32/21/22.
 */
 
 #define SOURCE_POT      1
@@ -47,10 +51,10 @@
 #endif
 
 // ----- pins -----
-const int POT_PIN           = 34;   // ADC1, input-only, safe with Wi-Fi
-const int BUTTON_PIN        = 32;   // "send reading" button to GND, INPUT_PULLUP
-const int CALIPER_CLK_PIN   = 25;   // SOURCE_CALIPER only, via level shifter
-const int CALIPER_DATA_PIN  = 26;   // SOURCE_CALIPER only, via level shifter
+const int POT_PIN           = 4;    // ESP32-S3 ADC1_CH3. Classic ESP32: use 34.
+const int BUTTON_PIN        = 5;    // "send reading" button to GND, INPUT_PULLUP. Classic ESP32: 32.
+const int CALIPER_CLK_PIN   = 6;    // SOURCE_CALIPER only, via level shifter
+const int CALIPER_DATA_PIN  = 7;    // SOURCE_CALIPER only, via level shifter
 
 // ----- potentiometer calibration (SOURCE_POT) -----
 // Fit these to YOUR gauge: record >= 5 known caliper positions and the raw ADC at each,
@@ -123,7 +127,7 @@ void setup() {
   pinMode(CALIPER_DATA_PIN, INPUT);
 #endif
 #if USE_LCD
-  Wire.begin(21, 22);
+  Wire.begin(8, 9);   // ESP32-S3 I2C: SDA=8, SCL=9. Classic ESP32: 21, 22.
   lcd.init(); lcd.backlight();
   lcd.print("QualityRelay"); lcd.setCursor(0, 1); lcd.print("measure ready");
 #endif
