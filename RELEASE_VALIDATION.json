@@ -1,0 +1,13 @@
+{
+  "status": "reference_implementation_only",
+  "pytest_result": "........................................................................ [ 81%]\n................                                                         [100%]\n88 passed in 2.31s",
+  "original_baseline_5_files": 33,
+  "external_repos_bundled": false,
+  "live_nebius_run": false,
+  "trained_nvidia_weights": false,
+  "physical_validation": false,
+  "simulation_only": true,
+  "total_manifest_files": 113,
+  "repository_import_validation": "Python sources compiled successfully; pytest was not rerun because pytest is not installed in the import environment.",
+  "scientific_superiority_proven": false
+}
